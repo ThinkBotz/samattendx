@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/card';
+import Diagnostics from './Diagnostics';
 import { Button } from '@/components/ui/button';
 import { Settings as SettingsIcon, Download, Upload, Trash2, Info } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
@@ -8,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function Settings() {
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const subjects = useAppStore((state) => state.subjects);
   const timetable = useAppStore((state) => state.timetable);
   const attendanceRecords = useAppStore((state) => state.attendanceRecords);
@@ -86,6 +88,16 @@ export default function Settings() {
 
   return (
     <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-24">
+      <div className="flex justify-end mb-2">
+        <Button variant="outline" onClick={() => setShowDiagnostics((v) => !v)}>
+          {showDiagnostics ? 'Hide Diagnostics' : 'Show Diagnostics'}
+        </Button>
+      </div>
+      {showDiagnostics && (
+        <div className="my-4">
+          <Diagnostics />
+        </div>
+      )}
       <div className="text-center px-2">
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Settings</h1>
         <p className="text-muted-foreground text-sm sm:text-base">Manage your app preferences</p>

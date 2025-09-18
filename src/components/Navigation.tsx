@@ -8,7 +8,7 @@ const navItems = [
   { path: '/calendar', icon: Calendar, label: 'Calendar' },
   { path: '/subjects', icon: BookOpen, label: 'Subjects' },
   { path: '/settings', icon: Settings, label: 'Settings' },
-  { path: '/diagnostics', icon: Activity, label: 'Diagnostics' },
+
 ];
 
 export const Navigation = () => {
