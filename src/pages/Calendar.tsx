@@ -193,23 +193,23 @@ export default function Calendar() {
         <p className="text-muted-foreground">View your attendance history</p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="bg-gradient-card shadow-card border-0 p-4 text-center">
-          <div className="text-2xl font-bold text-success">{stats.presentClasses}</div>
-          <div className="text-sm text-muted-foreground">Present</div>
+      {/* Quick Stats - Single Row */}
+      <div className="flex flex-row gap-2 justify-center items-center w-full">
+        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
+          <div className="text-lg font-bold text-success">{stats.presentClasses}</div>
+          <div className="text-xs text-muted-foreground">Present</div>
         </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-4 text-center">
-          <div className="text-2xl font-bold text-warning">{stats.absentClasses}</div>
-          <div className="text-sm text-muted-foreground">Absent</div>
+        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
+          <div className="text-lg font-bold text-warning">{stats.absentClasses}</div>
+          <div className="text-xs text-muted-foreground">Absent</div>
         </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-4 text-center">
-          <div className="text-2xl font-bold text-neutral">{stats.cancelledClasses}</div>
-          <div className="text-sm text-muted-foreground">Cancelled</div>
+        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
+          <div className="text-lg font-bold text-neutral">{stats.cancelledClasses}</div>
+          <div className="text-xs text-muted-foreground">Cancelled</div>
         </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-4 text-center">
-          <div className="text-2xl font-bold text-primary">{stats.percentage.toFixed(1)}%</div>
-          <div className="text-sm text-muted-foreground">Average</div>
+        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
+          <div className="text-lg font-bold text-primary">{stats.percentage.toFixed(1)}%</div>
+          <div className="text-xs text-muted-foreground">Average</div>
         </Card>
       </div>
 

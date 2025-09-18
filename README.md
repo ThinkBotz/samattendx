@@ -1,4 +1,16 @@
+# AttendX
+
+## Author
+
+**Name:** Syedmohamamd Sameer
+**Instagram:** @_samxiao
+
 # Welcome to your Lovable project
+
+
+## Project Overview
+
+AttendX is a modern attendance management application built for speed and usability. It leverages the latest web technologies to provide a seamless experience for users.
 
 ## Project info
 
@@ -50,9 +62,7 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
-
-This project is built with:
+## Technologies Used
 
 - Vite
 - TypeScript
