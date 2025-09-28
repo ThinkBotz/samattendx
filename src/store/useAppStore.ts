@@ -342,6 +342,7 @@ export const useAppStore = create<AppState>()(
 
       // Profile actions
       addUser: (name, avatarUrl) => {
+        if (!name || !name.trim()) return;
         set((state) => {
           // Save current active snapshot into profiles
           const currentId = state.activeUserId;
@@ -358,7 +359,7 @@ export const useAppStore = create<AppState>()(
           };
 
           const id = `user-${Date.now()}`;
-          const user: User = { id, name: name?.trim() || `Profile ${Object.keys(updatedProfiles).length + 1}`, createdAt: new Date(), avatarUrl } as User;
+          const user: User = { id, name: name.trim(), createdAt: new Date(), avatarUrl } as User;
           const emptyProfile = {
             user,
             subjects: [],
@@ -459,8 +460,9 @@ export const useAppStore = create<AppState>()(
       renameUser: (id, name) => {
         set((state) => {
           if (!state.profiles[id]) return {} as any;
+          if (!name || !name.trim()) return {} as any;
           const profiles = { ...state.profiles };
-          profiles[id] = { ...profiles[id], user: { ...profiles[id].user, name } };
+          profiles[id] = { ...profiles[id], user: { ...profiles[id].user, name: name.trim() } };
           const users = Object.values(profiles).map(p => p.user);
           return { profiles, users };
         });
