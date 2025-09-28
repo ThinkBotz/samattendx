@@ -19,10 +19,11 @@ export default function UserProfileSelector() {
 
 	const active = useMemo(() => users.find(u => u.id === activeUserId), [users, activeUserId]);
 
-	const [addOpen, setAddOpen] = useState(false);
-	const [renameOpen, setRenameOpen] = useState(false);
-	const [deleteOpen, setDeleteOpen] = useState(false);
-	const [name, setName] = useState('');
+		const [addOpen, setAddOpen] = useState(false);
+		const [renameOpen, setRenameOpen] = useState(false);
+		const [deleteOpen, setDeleteOpen] = useState(false);
+		const [name, setName] = useState('');
+		const [targetUserId, setTargetUserId] = useState<string | null>(null);
 
 	const onAdd = () => {
 		if (!name.trim()) return;
@@ -30,16 +31,21 @@ export default function UserProfileSelector() {
 		setName('');
 		setAddOpen(false);
 	};
-	const onRename = () => {
-		if (!name.trim() || !active) return;
-		renameUser(active.id, name.trim());
-		setRenameOpen(false);
-	};
-	const onDelete = () => {
-		if (!active) return;
-		removeUser(active.id);
-		setDeleteOpen(false);
-	};
+		const onRename = () => {
+			if (!name.trim()) return;
+			const id = targetUserId || active?.id;
+			if (!id) return;
+			renameUser(id, name.trim());
+			setRenameOpen(false);
+			setTargetUserId(null);
+		};
+		const onDelete = () => {
+			const id = targetUserId || active?.id;
+			if (!id) return;
+			removeUser(id);
+			setDeleteOpen(false);
+			setTargetUserId(null);
+		};
 
 	return (
 		<div className="flex items-center gap-2">
@@ -57,20 +63,45 @@ export default function UserProfileSelector() {
 				<DropdownMenuContent align="end" className="w-56">
 					<DropdownMenuLabel>Profiles</DropdownMenuLabel>
 					<DropdownMenuSeparator />
-					{users.map(u => (
-						<DropdownMenuItem key={u.id} onClick={() => switchUser(u.id)} className="flex items-center justify-between">
-							<span className="truncate">{u.name}</span>
-							{u.id === activeUserId && <Check className="h-4 w-4" />}
-						</DropdownMenuItem>
-					))}
+								{users.map(u => (
+									<DropdownMenuItem key={u.id} className="flex items-center justify-between gap-2">
+										<button
+											type="button"
+											className="flex-1 text-left truncate"
+											onClick={() => switchUser(u.id)}
+										>
+											{u.name}
+										</button>
+										<div className="flex items-center gap-2">
+											{u.id === activeUserId && <Check className="h-4 w-4" />}
+											<button
+												type="button"
+												className="p-1 rounded hover:bg-muted"
+												title="Rename"
+												onClick={(e) => { e.stopPropagation(); setName(u.name); setTargetUserId(u.id); setRenameOpen(true); }}
+											>
+												<Pencil className="h-4 w-4" />
+											</button>
+											<button
+												type="button"
+												className="p-1 rounded hover:bg-muted disabled:opacity-50"
+												title="Remove"
+												disabled={users.length <= 1}
+												onClick={(e) => { e.stopPropagation(); setTargetUserId(u.id); setDeleteOpen(true); }}
+											>
+												<Trash2 className="h-4 w-4" />
+											</button>
+										</div>
+									</DropdownMenuItem>
+								))}
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={() => { setName(''); setAddOpen(true); }}>
 						<Plus className="h-4 w-4 mr-2" /> Add profile
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => { setName(active?.name || ''); setRenameOpen(true); }}>
+								<DropdownMenuItem onClick={() => { setTargetUserId(active?.id || null); setName(active?.name || ''); setRenameOpen(true); }}>
 						<Pencil className="h-4 w-4 mr-2" /> Rename current
 					</DropdownMenuItem>
-					<DropdownMenuItem disabled={users.length <= 1} onClick={() => setDeleteOpen(true)}>
+								<DropdownMenuItem disabled={users.length <= 1} onClick={() => { setTargetUserId(active?.id || null); setDeleteOpen(true); }}>
 						<Trash2 className="h-4 w-4 mr-2" /> Remove current
 					</DropdownMenuItem>
 				</DropdownMenuContent>
