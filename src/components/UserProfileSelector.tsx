@@ -75,6 +75,12 @@ export default function UserProfileSelector() {
 					<DropdownMenuItem onClick={() => { setName(''); setAddOpen(true); }}>
 						<Plus className="h-4 w-4 mr-2" /> Add profile
 					</DropdownMenuItem>
+																	<DropdownMenuItem onClick={() => { setTargetUserId(active?.id || null); setName(active?.name || ''); setRenameOpen(true); }}>
+																		<Pencil className="h-4 w-4 mr-2" /> Rename current
+																	</DropdownMenuItem>
+																	<DropdownMenuItem disabled={users.length <= 1} onClick={() => { setTargetUserId(active?.id || null); setDeleteOpen(true); }}>
+																		<Trash2 className="h-4 w-4 mr-2" /> Remove current
+																	</DropdownMenuItem>
 														<DropdownMenuItem onClick={() => setManageOpen(true)}>
 															<Pencil className="h-4 w-4 mr-2" /> Manage profiles
 														</DropdownMenuItem>
