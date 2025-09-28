@@ -13,7 +13,8 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === "development" && componentTagger(),
-    VitePWA({
+    // Enable PWA only in production to avoid SW caching during development
+    mode === 'production' && VitePWA({
       injectRegister: 'auto',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt'],
