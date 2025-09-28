@@ -46,3 +46,19 @@ export interface AcademicSettings {
   semesterStart?: string; // ISO date
   semesterEnd?: string;   // ISO date
 }
+
+export interface User {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  createdAt: Date;
+}
+
+export interface AppUser {
+  user: User;
+  subjects: Subject[];
+  timetable: Timetable;
+  attendanceRecords: AttendanceRecord[];
+  attendanceStats: AttendanceStats;
+  academicSettings: AcademicSettings;
+}

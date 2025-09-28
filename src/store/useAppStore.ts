@@ -1,12 +1,24 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Subject, Timetable, AttendanceRecord, AttendanceStats, TimeSlot, AcademicSettings } from '@/types';
+import { Subject, Timetable, AttendanceRecord, TimeSlot, AcademicSettings, User } from '@/types';
 
 interface AppState {
+  // Active (visible) profile data - kept for backward compatibility
   subjects: Subject[];
   timetable: Timetable;
   attendanceRecords: AttendanceRecord[];
   settings: AcademicSettings;
+  
+  // Multi-user support
+  profiles: Record<string, {
+    user: User;
+    subjects: Subject[];
+    timetable: Timetable;
+    attendanceRecords: AttendanceRecord[];
+    settings: AcademicSettings;
+  }>;
+  activeUserId: string;
+  users: User[]; // convenient list for UI
   
   // Subject actions
   addSubject: (subject: Omit<Subject, 'id' | 'createdAt'>) => void;
@@ -29,6 +41,12 @@ interface AppState {
   addHoliday: (date: string) => void;
   removeHoliday: (date: string) => void;
   setSemester: (start?: string, end?: string) => void;
+  
+  // Profile actions
+  addUser: (name: string, avatarUrl?: string) => void;
+  switchUser: (id: string) => void;
+  removeUser: (id: string) => void;
+  renameUser: (id: string, name: string) => void;
   
   // Import/Export actions
   importData: (data: { subjects: Subject[]; timetable: Timetable; attendanceRecords: AttendanceRecord[]; settings?: AcademicSettings }) => void;
@@ -58,10 +76,28 @@ const defaultTimetable: Timetable = {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
+      // Default active view (will be replaced by profile switcher logic)
       subjects: [],
       timetable: defaultTimetable,
-  attendanceRecords: [],
-  settings: { holidays: [] },
+      attendanceRecords: [],
+      settings: { holidays: [] },
+      
+      // Profiles storage
+      profiles: (() => {
+        const id = 'default';
+        const user: User = { id, name: 'Profile 1', createdAt: new Date() };
+        return {
+          [id]: {
+            user,
+            subjects: [],
+            timetable: defaultTimetable,
+            attendanceRecords: [],
+            settings: { holidays: [] },
+          },
+        };
+      })(),
+      activeUserId: 'default',
+      users: [{ id: 'default', name: 'Profile 1', createdAt: new Date() }],
 
       addSubject: (subject) => {
         const newSubject: Subject = {
@@ -84,7 +120,6 @@ export const useAppStore = create<AppState>()(
       removeSubject: (id) => {
         set((state) => ({
           subjects: state.subjects.filter(s => s.id !== id),
-          // Also remove from timetable
           timetable: {
             ...state.timetable,
             schedule: state.timetable.schedule.map(day => ({
@@ -305,7 +340,133 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
-  importData: (data) => {
+      // Profile actions
+      addUser: (name, avatarUrl) => {
+        set((state) => {
+          // Save current active snapshot into profiles
+          const currentId = state.activeUserId;
+          const currentProfile = state.profiles[currentId];
+          const updatedProfiles = {
+            ...state.profiles,
+            [currentId]: {
+              ...currentProfile,
+              subjects: state.subjects,
+              timetable: state.timetable,
+              attendanceRecords: state.attendanceRecords,
+              settings: state.settings,
+            },
+          };
+
+          const id = `user-${Date.now()}`;
+          const user: User = { id, name: name?.trim() || `Profile ${Object.keys(updatedProfiles).length + 1}`, createdAt: new Date(), avatarUrl } as User;
+          const emptyProfile = {
+            user,
+            subjects: [],
+            timetable: defaultTimetable,
+            attendanceRecords: [],
+            settings: { holidays: [] },
+          };
+
+          const profiles = { ...updatedProfiles, [id]: emptyProfile };
+          const users = Object.values(profiles).map(p => p.user);
+
+          return {
+            profiles,
+            users,
+            activeUserId: id,
+            // Switch active view to new profile (empty)
+            subjects: [],
+            timetable: defaultTimetable,
+            attendanceRecords: [],
+            settings: { holidays: [] },
+          };
+        });
+      },
+
+      switchUser: (id) => {
+        set((state) => {
+          if (!id || id === state.activeUserId || !state.profiles[id]) return {} as any;
+          // Save current to active profile
+          const currentId = state.activeUserId;
+          const currentProfile = state.profiles[currentId];
+          const updatedProfiles = {
+            ...state.profiles,
+            [currentId]: {
+              ...currentProfile,
+              subjects: state.subjects,
+              timetable: state.timetable,
+              attendanceRecords: state.attendanceRecords,
+              settings: state.settings,
+            },
+          };
+          // Load target profile
+          const target = updatedProfiles[id];
+          const users = Object.values(updatedProfiles).map(p => p.user);
+          return {
+            profiles: updatedProfiles,
+            users,
+            activeUserId: id,
+            subjects: target.subjects,
+            timetable: target.timetable,
+            attendanceRecords: target.attendanceRecords,
+            settings: target.settings,
+          };
+        });
+      },
+
+      removeUser: (id) => {
+        set((state) => {
+          const ids = Object.keys(state.profiles);
+          if (!state.profiles[id] || ids.length <= 1) return {} as any; // cannot remove last
+
+          // First, save current active snapshot
+          const currentId = state.activeUserId;
+          const currentProfile = state.profiles[currentId];
+          let profiles = {
+            ...state.profiles,
+            [currentId]: {
+              ...currentProfile,
+              subjects: state.subjects,
+              timetable: state.timetable,
+              attendanceRecords: state.attendanceRecords,
+              settings: state.settings,
+            },
+          };
+
+          // Remove requested
+          const { [id]: _removed, ...rest } = profiles as any;
+          profiles = rest;
+          const users = Object.values(profiles).map(p => p.user);
+
+          // If removed active, switch to first remaining
+          let activeUserId = state.activeUserId;
+          if (id === state.activeUserId) {
+            activeUserId = Object.keys(profiles)[0];
+          }
+          const target = profiles[activeUserId];
+          return {
+            profiles,
+            users,
+            activeUserId,
+            subjects: target.subjects,
+            timetable: target.timetable,
+            attendanceRecords: target.attendanceRecords,
+            settings: target.settings,
+          };
+        });
+      },
+
+      renameUser: (id, name) => {
+        set((state) => {
+          if (!state.profiles[id]) return {} as any;
+          const profiles = { ...state.profiles };
+          profiles[id] = { ...profiles[id], user: { ...profiles[id].user, name } };
+          const users = Object.values(profiles).map(p => p.user);
+          return { profiles, users };
+        });
+      },
+
+      importData: (data) => {
         // Ensure subjects have proper Date objects
         const subjects = data.subjects.map(subject => ({
           ...subject,
@@ -334,6 +495,34 @@ export const useAppStore = create<AppState>()(
               ...subject,
               createdAt: new Date(subject.createdAt)
             }));
+          }
+          // Migrate to profiles if missing
+          if (!data.state.profiles) {
+            const id = 'default';
+            const user: User = { id, name: 'Profile 1', createdAt: new Date() };
+            data.state.profiles = {
+              [id]: {
+                user,
+                subjects: data.state.subjects || [],
+                timetable: data.state.timetable || defaultTimetable,
+                attendanceRecords: data.state.attendanceRecords || [],
+                settings: data.state.settings || { holidays: [] },
+              },
+            };
+            data.state.activeUserId = id;
+            data.state.users = [user];
+          } else {
+            // Ensure Dates for subjects inside profiles and user.createdAt
+            const profiles: Record<string, any> = data.state.profiles;
+            Object.keys(profiles).forEach((key) => {
+              const p = profiles[key];
+              p.user.createdAt = new Date(p.user.createdAt);
+              if (Array.isArray(p.subjects)) {
+                p.subjects = p.subjects.map((s: any) => ({ ...s, createdAt: new Date(s.createdAt) }));
+              }
+            });
+            // Keep users list in sync
+            data.state.users = Object.values(profiles).map((p: any) => p.user);
           }
           return data;
         },
