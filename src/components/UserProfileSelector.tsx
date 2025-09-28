@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Plus, Check, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Check, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 
 export default function UserProfileSelector() {
 	const users = useAppStore((s) => s.users);
@@ -49,8 +49,8 @@ export default function UserProfileSelector() {
 			setTargetUserId(null);
 		};
 
-	return (
-		<div className="flex items-center gap-2">
+		return (
+			<div className="flex items-center gap-2">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant="ghost" size="sm" className="px-2">
@@ -132,7 +132,12 @@ export default function UserProfileSelector() {
 				</AlertDialogContent>
 			</AlertDialog>
 
-					{/* Manage Profiles Dialog */}
+							{/* Quick manage button */}
+							<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Manage profiles" onClick={() => setManageOpen(true)}>
+								<MoreHorizontal className="h-4 w-4" />
+							</Button>
+
+							{/* Manage Profiles Dialog */}
 					<Dialog open={manageOpen} onOpenChange={setManageOpen}>
 						<DialogContent>
 							<DialogHeader>
