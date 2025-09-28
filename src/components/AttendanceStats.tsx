@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { Card } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import UserProfileSelector from '@/components/UserProfileSelector';
 
 export const AttendanceStats = () => {
   const attendanceRecords = useAppStore((state) => state.attendanceRecords);
@@ -64,6 +65,7 @@ export const AttendanceStats = () => {
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base sm:text-lg font-semibold text-foreground">Attendance Overview</h2>
         <div className="flex items-center gap-3 sm:gap-4">
+          <UserProfileSelector />
           <div className="flex items-center gap-2">
             <div
               className={cn(
