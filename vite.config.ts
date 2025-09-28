@@ -52,6 +52,9 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      ...(mode !== 'production' && {
+        'virtual:pwa-register/react': path.resolve(__dirname, './src/shims/virtual-pwa-register-react.ts'),
+      }),
     },
   },
 }));
