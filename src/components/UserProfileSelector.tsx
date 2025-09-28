@@ -19,18 +19,19 @@ export default function UserProfileSelector() {
 
 	const active = useMemo(() => users.find(u => u.id === activeUserId), [users, activeUserId]);
 
-		const [addOpen, setAddOpen] = useState(false);
+			const [addOpen, setAddOpen] = useState(false);
 		const [renameOpen, setRenameOpen] = useState(false);
 		const [deleteOpen, setDeleteOpen] = useState(false);
 		const [name, setName] = useState('');
 		const [targetUserId, setTargetUserId] = useState<string | null>(null);
 
-	const onAdd = () => {
-		if (!name.trim()) return;
-		addUser(name.trim());
-		setName('');
-		setAddOpen(false);
-	};
+		const onAdd = () => {
+			const trimmed = name.trim();
+			if (!trimmed) { return; }
+			addUser(trimmed);
+			setName('');
+			setAddOpen(false);
+		};
 		const onRename = () => {
 			if (!name.trim()) return;
 			const id = targetUserId || active?.id;
@@ -64,10 +65,10 @@ export default function UserProfileSelector() {
 					<DropdownMenuLabel>Profiles</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 								{users.map(u => (
-									<DropdownMenuItem key={u.id} className="flex items-center justify-between gap-2">
+												<DropdownMenuItem key={u.id} className="flex items-center justify-between gap-2">
 										<button
 											type="button"
-											className="flex-1 text-left truncate"
+														className="flex-1 text-left truncate"
 											onClick={() => switchUser(u.id)}
 										>
 											{u.name}
@@ -76,7 +77,7 @@ export default function UserProfileSelector() {
 											{u.id === activeUserId && <Check className="h-4 w-4" />}
 											<button
 												type="button"
-												className="p-1 rounded hover:bg-muted"
+															className="p-1 rounded hover:bg-muted focus:outline-none"
 												title="Rename"
 												onClick={(e) => { e.stopPropagation(); setName(u.name); setTargetUserId(u.id); setRenameOpen(true); }}
 											>
@@ -84,7 +85,7 @@ export default function UserProfileSelector() {
 											</button>
 											<button
 												type="button"
-												className="p-1 rounded hover:bg-muted disabled:opacity-50"
+															className="p-1 rounded hover:bg-muted disabled:opacity-50 focus:outline-none"
 												title="Remove"
 												disabled={users.length <= 1}
 												onClick={(e) => { e.stopPropagation(); setTargetUserId(u.id); setDeleteOpen(true); }}
@@ -118,10 +119,10 @@ export default function UserProfileSelector() {
 						<Label htmlFor="profile-name">Name</Label>
 						<Input id="profile-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Sam (Evening)" autoFocus />
 					</div>
-					<DialogFooter>
-						<Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-						<Button onClick={onAdd} disabled={!name.trim()}>Add</Button>
-					</DialogFooter>
+								<DialogFooter>
+									<Button variant="outline" onClick={() => { setName(''); setAddOpen(false); }}>Cancel</Button>
+									<Button onClick={onAdd} disabled={!name.trim()}>Add</Button>
+								</DialogFooter>
 				</DialogContent>
 			</Dialog>
 
