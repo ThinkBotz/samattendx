@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-// @ts-ignore provided by Vite PWA
+// @ts-expect-error provided by Vite PWA
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 export function PwaBannerProd() {

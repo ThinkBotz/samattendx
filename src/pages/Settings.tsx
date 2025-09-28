@@ -42,7 +42,7 @@ export default function Settings() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    try { localStorage.setItem('student-app:lastBackupAt', new Date().toISOString()); } catch {}
+    try { localStorage.setItem('student-app:lastBackupAt', new Date().toISOString()); } catch { /* ignore localStorage errors */ }
     toast.success('Data exported successfully!');
   };
 
@@ -64,7 +64,7 @@ export default function Settings() {
       }
       
   importData(data);
-  try { localStorage.setItem('student-app:lastRestoreAt', new Date().toISOString()); } catch {}
+  try { localStorage.setItem('student-app:lastRestoreAt', new Date().toISOString()); } catch { /* ignore localStorage errors */ }
       toast.success('Data imported successfully!');
       
       // Clear the file input
