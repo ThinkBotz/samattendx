@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react';
-// @ts-ignore provided by Vite PWA
-import { useRegisterSW } from 'virtual:pwa-register/react';
+import { useEffect, useMemo, useState } from 'react';
+// @ts-ignore provided by Vite PWA in production only
+let useRegisterSW: any = () => ({
+  needRefresh: [false, () => {}],
+  offlineReady: [false, () => {}],
+  updateServiceWorker: () => {},
+});
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  useRegisterSW = require('virtual:pwa-register/react').useRegisterSW;
+} catch {}
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
