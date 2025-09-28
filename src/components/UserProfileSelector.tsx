@@ -3,7 +3,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -64,37 +64,19 @@ export default function UserProfileSelector() {
 				<DropdownMenuContent align="end" className="w-56">
 					<DropdownMenuLabel>Profiles</DropdownMenuLabel>
 					<DropdownMenuSeparator />
-								{users.map(u => (
-												<DropdownMenuItem key={u.id} className="flex items-center justify-between gap-2">
-										<button
-											type="button"
-														className="flex-1 text-left truncate"
-											onClick={() => switchUser(u.id)}
-										>
-											{u.name}
-										</button>
-										<div className="flex items-center gap-2">
-											{u.id === activeUserId && <Check className="h-4 w-4" />}
-											<button
-												type="button"
-															className="p-1 rounded hover:bg-muted focus:outline-none"
-												title="Rename"
-												onClick={(e) => { e.stopPropagation(); setName(u.name); setTargetUserId(u.id); setRenameOpen(true); }}
-											>
-												<Pencil className="h-4 w-4" />
-											</button>
-											<button
-												type="button"
-															className="p-1 rounded hover:bg-muted disabled:opacity-50 focus:outline-none"
-												title="Remove"
-												disabled={users.length <= 1}
-												onClick={(e) => { e.stopPropagation(); setTargetUserId(u.id); setDeleteOpen(true); }}
-											>
-												<Trash2 className="h-4 w-4" />
-											</button>
-										</div>
-									</DropdownMenuItem>
-								))}
+											{users.map(u => (
+												<DropdownMenuSub key={u.id}>
+													<DropdownMenuSubTrigger className="flex items-center justify-between gap-2">
+														<span className="truncate">{u.name}</span>
+														{u.id === activeUserId && <Check className="h-4 w-4" />}
+													</DropdownMenuSubTrigger>
+													<DropdownMenuSubContent className="w-48">
+														<DropdownMenuItem onClick={() => switchUser(u.id)}>Switch to this profile</DropdownMenuItem>
+														<DropdownMenuItem onClick={() => { setName(u.name); setTargetUserId(u.id); setRenameOpen(true); }}>Rename</DropdownMenuItem>
+														<DropdownMenuItem disabled={users.length <= 1} onClick={() => { setTargetUserId(u.id); setDeleteOpen(true); }}>Remove</DropdownMenuItem>
+													</DropdownMenuSubContent>
+												</DropdownMenuSub>
+											))}
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={() => { setName(''); setAddOpen(true); }}>
 						<Plus className="h-4 w-4 mr-2" /> Add profile
