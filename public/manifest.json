@@ -1,10 +1,11 @@
 {
   "name": "Student Attendance Tracker",
-  "short_name": "Attendance",
-  "description": "Track your class attendance easily with this modern student dashboard",
+  "short_name": "AttendX",
+  "description": "Track your class attendance easily with this modern student dashboard featuring smart analytics, calendar integration, and attendance predictions",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": [],
   "background_color": "#fcfcff",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
@@ -39,11 +40,73 @@
   "categories": ["education", "productivity"],
   "lang": "en",
   "dir": "ltr",
-    "screenshots": [
+  "screenshots": [
     {
       "src": "android/android-launchericon-512-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Student Attendance Tracker Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mark Today's Attendance",
+      "short_name": "Today",
+      "description": "Quickly mark attendance for today's classes",
+      "url": "/",
+      "icons": [
+        {
+          "src": "android/android-launchericon-192-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "View Calendar",
+      "short_name": "Calendar",
+      "description": "Check attendance history and calendar",
+      "url": "/calendar",
+      "icons": [
+        {
+          "src": "android/android-launchericon-192-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Subjects & Stats",
+      "short_name": "Subjects",
+      "description": "Manage subjects and view statistics",
+      "url": "/subjects",
+      "icons": [
+        {
+          "src": "android/android-launchericon-192-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Configure app settings and preferences",
+      "url": "/settings",
+      "icons": [
+        {
+          "src": "android/android-launchericon-192-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+attendance",
+      "url": "/attendance?data=%s"
     }
   ]
 }
