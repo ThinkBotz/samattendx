@@ -138,7 +138,7 @@ export default function Settings() {
             </div>
             <div className="flex justify-between">
               <span>Version:</span>
-              <span className="font-medium text-foreground">1.2.0</span>
+              <span className="font-medium text-foreground">1.2.1</span>
             </div>
           </div>
         )}
