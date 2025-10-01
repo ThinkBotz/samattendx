@@ -383,10 +383,10 @@ export default function Calendar() {
                 allAbsent: (day) => daySummary(day) === 'allAbsent',
               }}
               modifiersClassNames={{
-                holiday: 'bg-blue-500/80 text-foreground rounded-full', // 🔵 Holiday/Weekend
+                holiday: 'bg-yellow-500/80 text-foreground rounded-full', // � Holiday/Weekend
                 examDay: 'bg-purple-500/80 text-foreground rounded-full', // 📚 Exam day
                 allPresent: 'bg-green-500/80 text-foreground rounded-full', // 🟢 Present
-                mixed: 'bg-yellow-500/80 text-foreground rounded-full', // 🟡 Partial  
+                mixed: 'bg-blue-500/80 text-foreground rounded-full', // � Partial  
                 allAbsent: 'bg-red-500/80 text-foreground rounded-full', // 🔴 Absent
               }}
             />
@@ -407,10 +407,10 @@ export default function Calendar() {
                 allAbsent: (day) => daySummary(day) === 'allAbsent',
               }}
               modifiersClassNames={{
-                holiday: 'bg-blue-500/80 text-foreground rounded-full', // 🔵 Holiday/Weekend
+                holiday: 'bg-yellow-500/80 text-foreground rounded-full', // � Holiday/Weekend
                 examDay: 'bg-purple-500/80 text-foreground rounded-full', // 📚 Exam day
                 allPresent: 'bg-green-500/80 text-foreground rounded-full', // 🟢 Present
-                mixed: 'bg-yellow-500/80 text-foreground rounded-full', // 🟡 Partial  
+                mixed: 'bg-blue-500/80 text-foreground rounded-full', // � Partial  
                 allAbsent: 'bg-red-500/80 text-foreground rounded-full', // 🔴 Absent
               }}
             />
