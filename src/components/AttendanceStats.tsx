@@ -98,38 +98,55 @@ export const AttendanceStats = () => {
   };
 
   return (
-    <Card className="bg-gradient-card shadow-card border-0 p-4 sm:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-base sm:text-lg font-semibold text-foreground">Attendance Overview</h2>
-        <div className="flex items-center gap-3 sm:gap-4">
-          <UserProfileSelector />
-          <div className="flex items-center gap-2">
+    <Card className="bg-gradient-card shadow-card border-0 p-3 xs:p-4 sm:p-6">
+      {/* Mobile-first responsive layout */}
+      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 xs:gap-4">
+        <h2 className="text-sm xs:text-base sm:text-lg font-semibold text-foreground">Attendance Overview</h2>
+        
+        {/* Enhanced mobile layout for stats */}
+        <div className="flex flex-wrap xs:flex-nowrap items-center gap-2 xs:gap-3 sm:gap-4 w-full xs:w-auto">
+          {/* Multi-user profile selector - always visible */}
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground hidden sm:inline">Profile:</span>
+            <UserProfileSelector />
+          </div>
+          
+          {/* Overall attendance */}
+          <div className="flex items-center gap-1.5 xs:gap-2">
             <div
               className={cn(
-                "inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full",
+                "inline-flex items-center justify-center w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full touch-manipulation",
                 getPercentageBg(stats.percentage),
               )}
             >
-              <span className={cn("text-xs sm:text-sm font-bold", getPercentageColor(stats.percentage))}>
+              <span className={cn("text-[10px] xs:text-xs sm:text-sm font-bold", getPercentageColor(stats.percentage))}>
                 {stats.percentage.toFixed(0)}%
               </span>
             </div>
-            <span className="text-[11px] sm:text-xs text-muted-foreground">Overall</span>
+            <span className="text-[9px] xs:text-[10px] sm:text-xs text-muted-foreground leading-tight">
+              Overall
+            </span>
           </div>
-          <div className="flex items-center gap-2">
+          
+          {/* Monthly attendance */}
+          <div className="flex items-center gap-1.5 xs:gap-2">
             <div
               className={cn(
-                "inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full",
+                "inline-flex items-center justify-center w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 rounded-full touch-manipulation",
                 getPercentageBg(stats.monthlyPercentage),
               )}
             >
-              <span className={cn("text-xs sm:text-sm font-bold", getPercentageColor(stats.monthlyPercentage))}>
+              <span className={cn("text-[10px] xs:text-xs sm:text-sm font-bold", getPercentageColor(stats.monthlyPercentage))}>
                 {stats.monthlyPercentage.toFixed(0)}%
               </span>
             </div>
-            <span className="text-[11px] sm:text-xs text-muted-foreground">This Month</span>
+            <span className="text-[9px] xs:text-[10px] sm:text-xs text-muted-foreground leading-tight">
+              This Month
+            </span>
           </div>
-          <div className="ml-1">
+          
+          {/* Theme toggle */}
+          <div className="ml-auto xs:ml-1">
             <ThemeToggle />
           </div>
         </div>

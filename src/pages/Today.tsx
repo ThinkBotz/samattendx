@@ -61,10 +61,10 @@ export default function Today() {
   };
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-4 xs:space-y-6 pb-20 xs:pb-24">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Today's Schedule</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-foreground mb-2">Today's Schedule</h1>
+        <p className="text-sm xs:text-base text-muted-foreground">
           {new Date().toLocaleDateString('en-US', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -75,59 +75,58 @@ export default function Today() {
       </div>
 
       {todaySchedule.length === 0 ? (
-        <Card className="bg-gradient-card shadow-card border-0 p-8 text-center">
-          <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No Classes Today</h3>
-          <p className="text-muted-foreground">Enjoy fandago</p>
+        <Card className="bg-gradient-card shadow-card border-0 p-6 xs:p-8 text-center">
+          <Clock className="h-10 w-10 xs:h-12 xs:w-12 text-muted-foreground mx-auto mb-3 xs:mb-4" />
+          <h3 className="text-base xs:text-lg font-semibold text-foreground mb-2">No Classes Today</h3>
+          <p className="text-sm xs:text-base text-muted-foreground">Enjoy your free day!</p>
         </Card>
       ) : (
         <>
-          <Card className="bg-gradient-card shadow-card border-0 p-4">
-            <h3 className="text-lg font-semibold text-foreground mb-3">Quick Actions</h3>
-            <div className="overflow-x-auto -mx-2 px-2">
-              <div className="flex items-center justify-center gap-2 whitespace-nowrap">
-                <Button
-                  onClick={() => handleBulkAttendance('present')}
-                  size="icon"
-                  aria-label="All Present"
-                  title="All Present"
-                  className="bg-success hover:bg-success/90 text-success-foreground h-8 w-8"
-                >
-                  <CheckCheck className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => handleBulkAttendance('absent')}
-                  size="icon"
-                  aria-label="All Absent"
-                  title="All Absent"
-                  className="bg-warning hover:bg-warning/90 text-warning-foreground h-8 w-8"
-                >
-                  <XCircle className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => handleBulkAttendance('cancelled')}
-                  size="icon"
-                  aria-label="All Off"
-                  title="All Off"
-                  className="bg-neutral hover:bg-neutral/90 text-neutral-foreground h-8 w-8"
-                >
-                  <Power className="h-4 w-4" />
-                </Button>
-                <Button
-                  onClick={() => handleBulkAttendance('clear')}
-                  variant="outline"
-                  size="icon"
-                  aria-label="Clear All"
-                  title="Clear All"
-                  className="border-muted-foreground text-muted-foreground hover:bg-muted h-8 w-8"
-                >
-                  <Eraser className="h-4 w-4" />
-                </Button>
-              </div>
+          <Card className="bg-gradient-card shadow-card border-0 p-3 xs:p-4">
+            <h3 className="text-base xs:text-lg font-semibold text-foreground mb-3">Quick Actions</h3>
+            {/* Compact quick actions with icons only */}
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                onClick={() => handleBulkAttendance('present')}
+                size="icon"
+                aria-label="All Present"
+                title="Mark All Present"
+                className="bg-success hover:bg-success/90 text-success-foreground w-10 h-10 min-h-[40px] touch-manipulation"
+              >
+                <CheckCheck className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={() => handleBulkAttendance('absent')}
+                size="icon"
+                aria-label="All Absent"
+                title="Mark All Absent"
+                className="bg-warning hover:bg-warning/90 text-warning-foreground w-10 h-10 min-h-[40px] touch-manipulation"
+              >
+                <XCircle className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={() => handleBulkAttendance('cancelled')}
+                size="icon"
+                aria-label="All Off"
+                title="Mark All Off"
+                className="bg-neutral hover:bg-neutral/90 text-neutral-foreground w-10 h-10 min-h-[40px] touch-manipulation"
+              >
+                <Power className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={() => handleBulkAttendance('clear')}
+                variant="outline"
+                size="icon"
+                aria-label="Clear All"
+                title="Clear All"
+                className="border-muted-foreground text-muted-foreground hover:bg-muted w-10 h-10 min-h-[40px] touch-manipulation"
+              >
+                <Eraser className="h-4 w-4" />
+              </Button>
             </div>
           </Card>
 
-          <div className="space-y-4">
+          <div className="space-y-3 xs:space-y-4">
             {todaySchedule.map((slot) => {
             const status = getAttendanceStatus(slot.id);
             const subjectName = getSubjectName(slot.subjectId);
@@ -135,57 +134,70 @@ export default function Today() {
             return (
               <Card 
                 key={slot.id} 
-                className="bg-gradient-card shadow-card border-0 p-4 hover:shadow-hover transition-all duration-200"
+                className="bg-gradient-card shadow-card border-0 p-3 hover:shadow-hover transition-all duration-200"
               >
-                <div className="flex items-center justify-between gap-3 mb-1">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">{subjectName}</h3>
+                {/* Compact layout for class cards */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-semibold text-foreground truncate">{subjectName}</h3>
+                      {/* Status indicator */}
+                      {status && (
+                        <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium", getStatusColor(status))}>
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {slot.startTime} - {slot.endTime}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-1 whitespace-nowrap">
+                  
+                  {/* Ultra compact icon-only buttons */}
+                  <div className="flex items-center gap-0.5">
                     {slot.subjectId && (
                       <>
                         <Button
                           variant={status === 'present' ? 'default' : 'outline'}
-                          size="icon"
+                          size="sm"
                           onClick={() => handleAttendance(slot.id, slot.subjectId, 'present')}
                           aria-label="Mark present"
-                          className="bg-success hover:bg-success/90 text-success-foreground border-success h-8 w-8"
+                          title="Present"
+                          className="w-8 h-8 p-0 min-h-[32px] touch-manipulation"
                         >
-                          <Check className="h-4 w-4" />
+                          <Check className="h-3.5 w-3.5" />
                         </Button>
                         <Button
-                          variant={status === 'absent' ? 'default' : 'outline'}
-                          size="icon"
+                          variant={status === 'absent' ? 'destructive' : 'outline'}
+                          size="sm"
                           onClick={() => handleAttendance(slot.id, slot.subjectId, 'absent')}
                           aria-label="Mark absent"
-                          className="bg-warning hover:bg-warning/90 text-warning-foreground border-warning h-8 w-8"
+                          title="Absent"
+                          className="w-8 h-8 p-0 min-h-[32px] touch-manipulation"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3.5 w-3.5" />
                         </Button>
                         <Button
-                          variant={status === 'cancelled' ? 'default' : 'outline'}
-                          size="icon"
+                          variant={status === 'cancelled' ? 'secondary' : 'outline'}
+                          size="sm"
                           onClick={() => handleAttendance(slot.id, slot.subjectId, 'cancelled')}
-                          aria-label="Mark off"
-                          className="bg-neutral hover:bg-neutral/90 text-neutral-foreground border-neutral h-8 w-8"
+                          aria-label="Mark cancelled"
+                          title="Cancelled"
+                          className="w-8 h-8 p-0 min-h-[32px] touch-manipulation"
                         >
-                          <Ban className="h-4 w-4" />
+                          <Ban className="h-3.5 w-3.5" />
                         </Button>
                         <Button
                           variant="outline"
-                          size="icon"
+                          size="sm"
                           onClick={() => handleClear(slot.id)}
                           aria-label="Clear status"
-                          className="border-muted-foreground text-muted-foreground hover:bg-muted h-8 w-8"
+                          title="Clear"
+                          className="w-8 h-8 p-0 min-h-[32px] touch-manipulation"
                         >
-                          <RotateCcw className="h-4 w-4" />
+                          <RotateCcw className="h-3.5 w-3.5" />
                         </Button>
                       </>
-                    )}
-                    {status && (
-                      <div className={cn("px-3 py-1 rounded-full text-sm font-medium", getStatusColor(status))}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                      </div>
                     )}
                   </div>
                 </div>

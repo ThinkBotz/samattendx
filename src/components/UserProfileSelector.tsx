@@ -50,15 +50,15 @@ export default function UserProfileSelector() {
 		};
 
 		return (
-			<div className="flex items-center gap-2">
+			<div className="flex items-center gap-1 xs:gap-2">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="ghost" size="sm" className="px-2">
+					<Button variant="ghost" size="sm" className="px-2 min-h-[44px] touch-manipulation border border-border/50 hover:border-primary/50">
 						<div className="flex items-center gap-2">
 							<Avatar className="h-6 w-6">
-								<AvatarFallback>{(active?.name || 'U').slice(0,1).toUpperCase()}</AvatarFallback>
+								<AvatarFallback className="text-xs bg-primary/10 text-primary">{(active?.name || 'U').slice(0,1).toUpperCase()}</AvatarFallback>
 							</Avatar>
-							<span className="text-sm font-medium max-w-[120px] truncate">{active?.name || 'Profile'}</span>
+							<span className="text-sm font-medium max-w-[100px] truncate">{active?.name || 'Profile'}</span>
 						</div>
 					</Button>
 				</DropdownMenuTrigger>
@@ -138,8 +138,8 @@ export default function UserProfileSelector() {
 				</AlertDialogContent>
 			</AlertDialog>
 
-							{/* Quick manage button */}
-							<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Manage profiles" onClick={() => setManageOpen(true)}>
+							{/* Quick manage button - hidden on mobile to save space */}
+							<Button variant="ghost" size="icon" className="hidden xs:flex h-8 w-8 min-h-[44px] touch-manipulation" aria-label="Manage profiles" onClick={() => setManageOpen(true)}>
 								<MoreHorizontal className="h-4 w-4" />
 							</Button>
 

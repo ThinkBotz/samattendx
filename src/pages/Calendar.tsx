@@ -26,6 +26,7 @@ export default function Calendar() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [multiMode, setMultiMode] = useState(false);
   const [multi, setMulti] = useState<Date[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   // --- Monthly Attendance Logic ---
   // Group attendance records by month
@@ -276,127 +277,35 @@ export default function Calendar() {
   return (
     <div className="space-y-6 pb-24">
 
-      {/* Monthly Attendance Stats */}
-      <Card className="bg-gradient-card shadow-card border-0 p-6">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-foreground mb-2">Monthly Attendance Overview</h2>
-          <p className="text-muted-foreground text-sm">Select a month to view your average attendance and requirements.</p>
-        </div>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {allMonths.length === 0 && <span className="text-muted-foreground">No attendance data yet.</span>}
-          {allMonths.map(month => (
-            <Button
-              key={month}
-              size="sm"
-              variant={selectedMonth === month ? 'default' : 'outline'}
-              onClick={() => setSelectedMonth(selectedMonth === month ? undefined : month)}
-            >
-              {month}
-            </Button>
-          ))}
-        </div>
-        {selectedMonth && (() => {
-          const monthlyStats = getMonthlyStats(selectedMonth) || { percentage: 0, present: 0, absent: 0 };
-          const attendanceReq = getAttendanceRequirement(selectedMonth) || { workingDays: 0, totalPeriods: 0, minAttendPeriods: 0, stillCanSkip: 0, fullDaysCanSkip: 0, perPeriodValue: 0 };
-          return (
-            <Card className="p-4">
-              <div className="space-y-2">
-                <div className="grid grid-cols-5 gap-3">
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-primary">{monthlyStats.percentage ?? 0}%</div>
-                    <div className="text-xs text-muted-foreground">Avg. Attendance</div>
-                  </div>
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-success">{monthlyStats.present ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">Present</div>
-                  </div>
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-warning">{monthlyStats.absent ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">Absent</div>
-                  </div>
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-foreground">{attendanceReq.workingDays ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">Working Days</div>
-                  </div>
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-foreground">{attendanceReq.totalPeriods ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">Total Periods</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-5 gap-3 mt-2">
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-success">{attendanceReq.minAttendPeriods ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">Min. Periods to Attend</div>
-                  </div>
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-warning">{attendanceReq.stillCanSkip ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">Periods Can Skip</div>
-                  </div>
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-warning">{attendanceReq.fullDaysCanSkip ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">Full Days Can Skip</div>
-                  </div>
-                  <div className="p-3 text-center">
-                    <div className="text-lg font-bold text-primary">{attendanceReq.perPeriodValue ?? 0}</div>
-                    <div className="text-xs text-muted-foreground">% per Period</div>
-                  </div>
-                  <div></div>
-                </div>
-              </div>
-            </Card>
-          );
-        })()}
-      </Card>
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Calendar</h1>
-        <p className="text-muted-foreground">View your attendance history</p>
-      </div>
-
-      {/* Quick Stats - Single Row */}
-      <div className="flex flex-row gap-2 justify-center items-center w-full">
-        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
-          <div className="text-lg font-bold text-success">{stats.presentClasses}</div>
-          <div className="text-xs text-muted-foreground">Present</div>
-        </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
-          <div className="text-lg font-bold text-warning">{stats.absentClasses}</div>
-          <div className="text-xs text-muted-foreground">Absent</div>
-        </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
-          <div className="text-lg font-bold text-neutral">{stats.cancelledClasses}</div>
-          <div className="text-xs text-muted-foreground">Cancelled</div>
-        </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-2 text-center min-w-[60px]">
-          <div className="text-lg font-bold text-primary">{stats.percentage.toFixed(1)}%</div>
-          <div className="text-xs text-muted-foreground">Average</div>
-        </Card>
-      </div>
-
-      {/* Interactive Calendar */}
-      <Card className="bg-gradient-card shadow-card border-0 p-6">
+      {/* Interactive Calendar - Enhanced for mobile */}
+      <Card className="bg-gradient-card shadow-card border-0 p-3 xs:p-4 sm:p-6">
         <div className="text-center mb-4">
-          <h2 className="text-xl font-semibold text-foreground mb-2">Select a Date</h2>
-          <p className="text-sm text-muted-foreground">Click on a date to view and edit attendance</p>
+          <h2 className="text-lg xs:text-xl font-semibold text-foreground mb-2">Select a Date</h2>
+          <p className="text-xs xs:text-sm text-muted-foreground">Tap on a date to view and edit attendance</p>
         </div>
         <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-2 flex-wrap justify-end w-full">
+          {/* Enhanced mobile controls */}
+          <div className="flex items-center gap-2 flex-wrap justify-center xs:justify-end w-full">
             <Button
               variant={multiMode ? 'default' : 'outline'}
-              size="icon"
-              className="p-1 h-8 w-8"
+              size="sm"
+              className="min-h-[44px] touch-manipulation"
               onClick={() => { setMultiMode((v) => !v); setMulti([]); }}
               aria-label="Multi Select"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-edit-3"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              <span className="text-xs xs:text-sm">Multi Select</span>
             </Button>
             {multiMode && multi.length > 0 && (
               <>
-                <Button size="sm" variant="outline" onClick={() => {
+                <Button size="sm" variant="outline" className="min-h-[44px] touch-manipulation" onClick={() => {
                   const list = multi.map(d => format(d, 'yyyy-MM-dd'));
                   bulkMarkDates(list, 'present');
                   setMulti([]);
-                }}>Apply Present</Button>
-                <Button size="sm" variant="outline" onClick={() => {
+                }}>
+                  <span className="text-xs xs:text-sm">Present ({multi.length})</span>
+                </Button>
+                <Button size="sm" variant="outline" className="min-h-[44px] touch-manipulation" onClick={() => {
                   const list = multi.map(d => format(d, 'yyyy-MM-dd'));
                   bulkMarkDates(list, 'absent');
                   setMulti([]);
@@ -440,10 +349,10 @@ export default function Calendar() {
                 allAbsent: (day) => daySummary(day) === 'allAbsent',
               }}
               modifiersClassNames={{
-                holiday: 'bg-warning/60 text-foreground',
-                allPresent: 'bg-success/60 text-foreground',
-                mixed: 'bg-primary/60 text-foreground',
-                allAbsent: 'bg-destructive/60 text-foreground',
+                holiday: 'bg-warning/80 text-foreground rounded-full',
+                allPresent: 'bg-success/80 text-foreground rounded-full',
+                mixed: 'bg-primary/80 text-foreground rounded-full',
+                allAbsent: 'bg-destructive/80 text-foreground rounded-full',
               }}
             />
           ) : (
@@ -452,7 +361,7 @@ export default function Calendar() {
               selected={multi as any}
               onDayClick={toggleMultiDate}
               classNames={{
-                day_selected: 'ring-2 ring-primary ring-offset-2 bg-transparent text-foreground',
+                day_selected: 'ring-2 ring-primary ring-offset-1 bg-transparent text-foreground rounded-full',
               }}
               className="rounded-md border pointer-events-auto"
               modifiers={{
@@ -462,10 +371,10 @@ export default function Calendar() {
                 allAbsent: (day) => daySummary(day) === 'allAbsent',
               }}
               modifiersClassNames={{
-                holiday: 'bg-warning/60 text-foreground',
-                allPresent: 'bg-success/60 text-foreground',
-                mixed: 'bg-primary/60 text-foreground',
-                allAbsent: 'bg-destructive/60 text-foreground',
+                holiday: 'bg-warning/80 text-foreground rounded-full',
+                allPresent: 'bg-success/80 text-foreground rounded-full',
+                mixed: 'bg-primary/80 text-foreground rounded-full',
+                allAbsent: 'bg-destructive/80 text-foreground rounded-full',
               }}
             />
           )}
@@ -585,11 +494,124 @@ export default function Calendar() {
         </DialogContent>
       </Dialog>
 
+      <div className="text-center">
+        <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-foreground mb-2">Calendar</h1>
+        <p className="text-sm xs:text-base text-muted-foreground">View your attendance history</p>
+      </div>
+
+      {/* Optimized single-row stats grid */}
+      <div className="grid grid-cols-4 gap-1 xs:gap-2 w-full">
+        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
+          <div className="text-sm xs:text-base sm:text-lg font-bold text-success">{stats.presentClasses}</div>
+          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Present</div>
+        </Card>
+        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
+          <div className="text-sm xs:text-base sm:text-lg font-bold text-warning">{stats.absentClasses}</div>
+          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Absent</div>
+        </Card>
+        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
+          <div className="text-sm xs:text-base sm:text-lg font-bold text-neutral">{stats.cancelledClasses}</div>
+          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Cancelled</div>
+        </Card>
+        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
+          <div className="text-sm xs:text-base sm:text-lg font-bold text-primary">{stats.percentage.toFixed(1)}%</div>
+          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Average</div>
+        </Card>
+      </div>
+
+      {/* Enhanced Monthly Attendance Overview */}
+      <Card className="bg-gradient-card shadow-card border-0 p-4 xs:p-6">
+        <div className="mb-4">
+          <h2 className="text-lg xs:text-xl font-semibold text-foreground mb-2">📊 Monthly Overview</h2>
+          <p className="text-muted-foreground text-xs xs:text-sm">Select a month to view detailed analysis</p>
+        </div>
+        
+        {allMonths.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-muted-foreground text-sm">No attendance data yet</div>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {allMonths.map(month => (
+                <Button
+                  key={month}
+                  size="sm"
+                  variant={selectedMonth === month ? 'default' : 'outline'}
+                  onClick={() => setSelectedMonth(selectedMonth === month ? undefined : month)}
+                  className="text-xs"
+                >
+                  {month}
+                </Button>
+              ))}
+            </div>
+            
+            {selectedMonth && (() => {
+              const monthlyStats = getMonthlyStats(selectedMonth) || { percentage: 0, present: 0, absent: 0 };
+              const attendanceReq = getAttendanceRequirement(selectedMonth) || { workingDays: 0, totalPeriods: 0, minAttendPeriods: 0, stillCanSkip: 0, fullDaysCanSkip: 0, perPeriodValue: 0 };
+              return (
+                <div className="space-y-4">
+                  {/* Main Stats */}
+                  <div className="grid grid-cols-2 xs:grid-cols-4 gap-3">
+                    <Card className="p-3 text-center bg-primary/10 border-primary/20">
+                      <div className="text-xl xs:text-2xl font-bold text-primary">{monthlyStats.percentage ?? 0}%</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">Avg. Attendance</div>
+                    </Card>
+                    <Card className="p-3 text-center bg-success/10 border-success/20">
+                      <div className="text-xl xs:text-2xl font-bold text-success">{monthlyStats.present ?? 0}</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">Present</div>
+                    </Card>
+                    <Card className="p-3 text-center bg-warning/10 border-warning/20">
+                      <div className="text-xl xs:text-2xl font-bold text-warning">{monthlyStats.absent ?? 0}</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">Absent</div>
+                    </Card>
+                    <Card className="p-3 text-center bg-muted/10 border-muted/20">
+                      <div className="text-xl xs:text-2xl font-bold text-foreground">{attendanceReq.totalPeriods ?? 0}</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">Total Periods</div>
+                    </Card>
+                  </div>
+                  
+                  {/* Detailed Requirements */}
+                  <div className="grid grid-cols-2 xs:grid-cols-4 gap-2 xs:gap-3">
+                    <div className="p-2 xs:p-3 text-center bg-success/5 rounded-lg border border-success/10">
+                      <div className="text-sm xs:text-base font-bold text-success">{attendanceReq.minAttendPeriods ?? 0}</div>
+                      <div className="text-[9px] xs:text-[10px] text-muted-foreground leading-tight">Min. Periods to Attend</div>
+                    </div>
+                    <div className="p-2 xs:p-3 text-center bg-warning/5 rounded-lg border border-warning/10">
+                      <div className="text-sm xs:text-base font-bold text-warning">{attendanceReq.stillCanSkip ?? 0}</div>
+                      <div className="text-[9px] xs:text-[10px] text-muted-foreground leading-tight">Periods Can Skip</div>
+                    </div>
+                    <div className="p-2 xs:p-3 text-center bg-orange-500/5 rounded-lg border border-orange-500/10">
+                      <div className="text-sm xs:text-base font-bold text-orange-600">{attendanceReq.fullDaysCanSkip ?? 0}</div>
+                      <div className="text-[9px] xs:text-[10px] text-muted-foreground leading-tight">Full Days Can Skip</div>
+                    </div>
+                    <div className="p-2 xs:p-3 text-center bg-primary/5 rounded-lg border border-primary/10">
+                      <div className="text-sm xs:text-base font-bold text-primary">{attendanceReq.perPeriodValue ?? 0}%</div>
+                      <div className="text-[9px] xs:text-[10px] text-muted-foreground leading-tight">Per Period Value</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </>
+        )}
+      </Card>
+
       {/* Attendance History */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground mb-4">Attendance History</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-foreground">Attendance History</h2>
+          <Button
+            variant={showHistory ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setShowHistory(!showHistory)}
+            className="min-h-[44px] touch-manipulation"
+          >
+            {showHistory ? 'Hide History' : 'View History'}
+          </Button>
+        </div>
         
-        {sortedDates.length === 0 ? (
+        {showHistory && (sortedDates.length === 0 ? (
           <Card className="bg-gradient-card shadow-card border-0 p-12 text-center">
             <CalendarIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-foreground mb-2">No Attendance Records</h3>
@@ -640,7 +662,7 @@ export default function Calendar() {
               );
             })}
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

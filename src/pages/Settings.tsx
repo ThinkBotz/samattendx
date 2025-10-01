@@ -10,6 +10,9 @@ import { Label } from '@/components/ui/label';
 
 export default function Settings() {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [showDataManagement, setShowDataManagement] = useState(false);
+  const [showAcademicSettings, setShowAcademicSettings] = useState(false);
+  const [showAppInfo, setShowAppInfo] = useState(false);
   const subjects = useAppStore((state) => state.subjects);
   const timetable = useAppStore((state) => state.timetable);
   const attendanceRecords = useAppStore((state) => state.attendanceRecords);
@@ -105,33 +108,58 @@ export default function Settings() {
 
       {/* App Info */}
       <Card className="bg-gradient-card shadow-card border-0 p-4 sm:p-6">
-        <div className="flex items-center mb-4">
-          <Info className="h-5 w-5 text-primary mr-2" />
-          <h2 className="text-lg font-semibold text-foreground">App Information</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Info className="h-5 w-5 text-primary mr-2" />
+            <h2 className="text-lg font-semibold text-foreground">App Information</h2>
+          </div>
+          <Button
+            variant={showAppInfo ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setShowAppInfo(!showAppInfo)}
+            className="min-h-[44px] touch-manipulation"
+          >
+            {showAppInfo ? 'Hide Details' : 'Show Details'}
+          </Button>
         </div>
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <div className="flex justify-between">
-            <span>Total Subjects:</span>
-            <span className="font-medium text-foreground">{subjects.length}</span>
+        
+        {showAppInfo && (
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <div className="flex justify-between">
+              <span>Total Subjects:</span>
+              <span className="font-medium text-foreground">{subjects.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Attendance Records:</span>
+              <span className="font-medium text-foreground">{attendanceRecords.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Version:</span>
+              <span className="font-medium text-foreground">1.2.0</span>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span>Attendance Records:</span>
-            <span className="font-medium text-foreground">{attendanceRecords.length}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Version:</span>
-            <span className="font-medium text-foreground">1.2.0</span>
-          </div>
-        </div>
+        )}
       </Card>
 
       {/* Academic Settings */}
       <Card className="bg-gradient-card shadow-card border-0 p-4 sm:p-6">
-        <div className="flex items-center mb-4">
-          <SettingsIcon className="h-5 w-5 text-primary mr-2" />
-          <h2 className="text-lg font-semibold text-foreground">Academic Settings</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <SettingsIcon className="h-5 w-5 text-primary mr-2" />
+            <h2 className="text-lg font-semibold text-foreground">Academic Settings</h2>
+          </div>
+          <Button
+            variant={showAcademicSettings ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setShowAcademicSettings(!showAcademicSettings)}
+            className="min-h-[44px] touch-manipulation"
+          >
+            {showAcademicSettings ? 'Hide Options' : 'Show Options'}
+          </Button>
         </div>
-        <div className="space-y-4">
+        
+        {showAcademicSettings && (
+          <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="semesterStart">Semester Start</Label>
@@ -164,16 +192,29 @@ export default function Settings() {
           ) : (
             <p className="text-sm text-muted-foreground">No holidays added</p>
           )}
-        </div>
+          </div>
+        )}
       </Card>
 
   {/* Data Management */}
       <Card className="bg-gradient-card shadow-card border-0 p-4 sm:p-6">
-        <div className="flex items-center mb-4">
-          <SettingsIcon className="h-5 w-5 text-primary mr-2" />
-          <h2 className="text-lg font-semibold text-foreground">Data Management</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <SettingsIcon className="h-5 w-5 text-primary mr-2" />
+            <h2 className="text-lg font-semibold text-foreground">Data Management</h2>
+          </div>
+          <Button
+            variant={showDataManagement ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setShowDataManagement(!showDataManagement)}
+            className="min-h-[44px] touch-manipulation"
+          >
+            {showDataManagement ? 'Hide Options' : 'Show Options'}
+          </Button>
         </div>
-        <div className="space-y-4">
+        
+        {showDataManagement && (
+          <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-foreground">Export Data</h3>
@@ -207,6 +248,7 @@ export default function Settings() {
             </Button>
           </div>
         </div>
+        )}
       </Card>
 
       {/* Cloud Backup removed: using local export/import only */}
