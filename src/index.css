@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Student Dashboard Design System - Modern, Clean, Encouraging */
+
+@layer base {
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 224 60% 6%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+
+  --primary: 222 85% 55%;
+    --primary-foreground: 0 0% 100%;
+  --primary-hover: 222 85% 48%;
+
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+
+  --muted: 220 15% 95%;
+  --muted-foreground: 220 9% 35%;
+
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+
+  --success: 142 72% 34%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 76% 96%;
+
+  --warning: 20 90% 52%;
+    --warning-foreground: 0 0% 100%;
+  --warning-light: 20 93% 92%;
+
+  --neutral: 220 10% 50%;
+    --neutral-foreground: 0 0% 100%;
+  --neutral-light: 220 18% 96%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+  --border: 220 12% 88%;
+  --input: 220 12% 88%;
+  --ring: 222 85% 55%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(222 85% 55%), hsl(213 94% 68%));
+  --gradient-background: linear-gradient(180deg, hsl(220 20% 98%), hsl(220 15% 96%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 20% 98%));
+
+    /* Shadows */
+    --shadow-card: 0 4px 20px -2px hsl(262 83% 58% / 0.1);
+    --shadow-hover: 0 8px 30px -2px hsl(262 83% 58% / 0.15);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 50% 6%;
+    --foreground: 210 40% 96%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+  /* Brand accents tuned for dark */
+  --primary: 222 85% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 24% 18%;
+    --secondary-foreground: 210 40% 98%;
+
+  --muted: 220 24% 16%;
+  --muted-foreground: 215 18% 70%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+  --ring: 222 90% 60%;
+
+    /* Dark gradients for backgrounds and cards */
+    --gradient-background: linear-gradient(180deg, hsl(222 50% 6%), hsl(222 45% 10%));
+    --gradient-card: linear-gradient(145deg, hsl(222 48% 10%), hsl(222 38% 8%));
+    --gradient-primary: linear-gradient(135deg, hsl(222 85% 60%), hsl(210 90% 56%));
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background: var(--gradient-background);
+    color: hsl(var(--foreground));
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+}
