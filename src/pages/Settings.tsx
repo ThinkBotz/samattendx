@@ -20,9 +20,12 @@ export default function Settings() {
   const settings = useAppStore((state) => state.settings);
   const addHoliday = useAppStore((state) => state.addHoliday);
   const removeHoliday = useAppStore((state) => state.removeHoliday);
+  const addExamDay = useAppStore((state) => state.addExamDay);
+  const removeExamDay = useAppStore((state) => state.removeExamDay);
   const setSemester = useAppStore((state) => state.setSemester);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [holidayInput, setHolidayInput] = useState('');
+  const [examDayInput, setExamDayInput] = useState('');
   const [semesterStart, setSemesterStart] = useState<string>(settings.semesterStart || '');
   const [semesterEnd, setSemesterEnd] = useState<string>(settings.semesterEnd || '');
 
@@ -184,13 +187,32 @@ export default function Settings() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {settings.holidays.map((d) => (
                 <div key={d} className="flex items-center justify-between p-2 bg-card rounded border">
-                  <span className="text-sm text-foreground">{d}</span>
+                  <span className="text-sm text-foreground">🔵 {d}</span>
                   <Button size="sm" variant="ghost" onClick={() => removeHoliday(d)}>Remove</Button>
                 </div>
               ))}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">No holidays added</p>
+          )}
+          <div className="space-y-2">
+            <Label>Add Exam Day (no attendance taken)</Label>
+            <div className="flex gap-2">
+              <Input type="date" value={examDayInput} onChange={(e) => setExamDayInput(e.target.value)} />
+              <Button onClick={() => { if (examDayInput) { addExamDay(examDayInput); setExamDayInput(''); toast.success('Exam day added'); } }}>📚 Add</Button>
+            </div>
+          </div>
+          {settings.examDays?.length ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {settings.examDays.map((d) => (
+                <div key={d} className="flex items-center justify-between p-2 bg-card rounded border border-purple-200">
+                  <span className="text-sm text-foreground">📚 {d}</span>
+                  <Button size="sm" variant="ghost" onClick={() => removeExamDay(d)}>Remove</Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No exam days added</p>
           )}
           </div>
         )}

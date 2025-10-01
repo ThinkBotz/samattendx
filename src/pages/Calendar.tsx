@@ -21,6 +21,8 @@ export default function Calendar() {
   const bulkClearDates = useAppStore((state) => state.bulkClearDates);
   const addHoliday = useAppStore((state) => state.addHoliday);
   const removeHoliday = useAppStore((state) => state.removeHoliday);
+  const addExamDay = useAppStore((state) => state.addExamDay);
+  const removeExamDay = useAppStore((state) => state.removeExamDay);
   
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -74,7 +76,8 @@ export default function Calendar() {
       const date = new Date(year, m - 1, d);
       const iso = format(date, 'yyyy-MM-dd');
       if (date.getDay() === 0) continue; // Sunday
-      if (settings.holidays?.includes(iso)) continue;
+      if (settings.holidays?.includes(iso)) continue; // Holiday
+      if (settings.examDays?.includes(iso)) continue; // Exam day (no attendance taken)
       const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
       const schedule = timetable.schedule.find((s) => s.day === dayName);
       const periods = schedule ? schedule.timeSlots.filter((s) => s.subjectId).length : 0;
@@ -118,8 +121,14 @@ export default function Calendar() {
     return isSunday(d) || (settings.holidays?.includes(iso) ?? false);
   };
 
-  const daySummary = (d: Date): 'holiday' | 'allPresent' | 'allAbsent' | 'mixed' | undefined => {
+  const isExamDay = (d: Date) => {
+    const iso = format(d, 'yyyy-MM-dd');
+    return settings.examDays?.includes(iso) ?? false;
+  };
+
+  const daySummary = (d: Date): 'holiday' | 'examDay' | 'allPresent' | 'allAbsent' | 'mixed' | undefined => {
     if (isHolidayDate(d)) return 'holiday';
+    if (isExamDay(d)) return 'examDay'; // Exam days are treated as no-attendance days
     const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
     const schedule = timetable.schedule.find((s) => s.day === dayName);
     if (!schedule) return undefined;
@@ -238,7 +247,7 @@ export default function Calendar() {
     clearAttendance(dateString, timeSlotId);
   };
 
-  const applyDayAction = (action: 'present' | 'absent' | 'clear' | 'holiday') => {
+  const applyDayAction = (action: 'present' | 'absent' | 'clear' | 'holiday' | 'examDay') => {
     const dateObj = selectedDate || new Date();
     const dateString = format(dateObj, 'yyyy-MM-dd');
     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
@@ -256,7 +265,20 @@ export default function Calendar() {
       setSelectedDate(undefined);
       return;
     }
-    if (isHolidayDate(dateObj)) return; // prevent overriding on holiday
+    if (action === 'examDay') {
+      const isExam = settings.examDays?.includes(dateString);
+      if (isExam) {
+        removeExamDay(dateString);
+      } else {
+        addExamDay(dateString);
+        // mark all as cancelled for exam day (no attendance taken)
+        useAppStore.getState().markAllDayAttendance(dateString, dayName, 'cancelled');
+      }
+      setIsDialogOpen(false);
+      setSelectedDate(undefined);
+      return;
+    }
+    if (isHolidayDate(dateObj) || isExamDay(dateObj)) return; // prevent overriding on holiday or exam day
     useAppStore.getState().markAllDayAttendance(dateString, dayName, action);
     setIsDialogOpen(false);
     setSelectedDate(undefined);
@@ -323,8 +345,19 @@ export default function Calendar() {
                 <Button size="sm" variant="outline" onClick={() => {
                   const list = multi.map(d => format(d, 'yyyy-MM-dd'));
                   list.forEach(dateString => {
-                    // Remove holiday and clear all attendance for the date
+                    const dateObj = new Date(dateString);
+                    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+                    addExamDay(dateString);
+                    useAppStore.getState().markAllDayAttendance(dateString, dayName, 'cancelled');
+                  });
+                  setMulti([]);
+                }}>📚 Exam Day</Button>
+                <Button size="sm" variant="outline" onClick={() => {
+                  const list = multi.map(d => format(d, 'yyyy-MM-dd'));
+                  list.forEach(dateString => {
+                    // Remove holiday, exam day, and clear all attendance for the date
                     removeHoliday(dateString);
+                    removeExamDay(dateString);
                     const dateObj = new Date(dateString);
                     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
                     useAppStore.getState().markAllDayAttendance(dateString, dayName, 'clear');
@@ -344,15 +377,17 @@ export default function Calendar() {
               className="rounded-md border pointer-events-auto"
               modifiers={{
                 holiday: (day) => daySummary(day) === 'holiday',
+                examDay: (day) => daySummary(day) === 'examDay',
                 allPresent: (day) => daySummary(day) === 'allPresent',
                 mixed: (day) => daySummary(day) === 'mixed',
                 allAbsent: (day) => daySummary(day) === 'allAbsent',
               }}
               modifiersClassNames={{
-                holiday: 'bg-warning/80 text-foreground rounded-full',
-                allPresent: 'bg-success/80 text-foreground rounded-full',
-                mixed: 'bg-primary/80 text-foreground rounded-full',
-                allAbsent: 'bg-destructive/80 text-foreground rounded-full',
+                holiday: 'bg-blue-500/80 text-foreground rounded-full', // 🔵 Holiday/Weekend
+                examDay: 'bg-purple-500/80 text-foreground rounded-full', // 📚 Exam day
+                allPresent: 'bg-green-500/80 text-foreground rounded-full', // 🟢 Present
+                mixed: 'bg-yellow-500/80 text-foreground rounded-full', // 🟡 Partial  
+                allAbsent: 'bg-red-500/80 text-foreground rounded-full', // 🔴 Absent
               }}
             />
           ) : (
@@ -366,15 +401,17 @@ export default function Calendar() {
               className="rounded-md border pointer-events-auto"
               modifiers={{
                 holiday: (day) => daySummary(day) === 'holiday',
+                examDay: (day) => daySummary(day) === 'examDay',
                 allPresent: (day) => daySummary(day) === 'allPresent',
                 mixed: (day) => daySummary(day) === 'mixed',
                 allAbsent: (day) => daySummary(day) === 'allAbsent',
               }}
               modifiersClassNames={{
-                holiday: 'bg-warning/80 text-foreground rounded-full',
-                allPresent: 'bg-success/80 text-foreground rounded-full',
-                mixed: 'bg-primary/80 text-foreground rounded-full',
-                allAbsent: 'bg-destructive/80 text-foreground rounded-full',
+                holiday: 'bg-blue-500/80 text-foreground rounded-full', // 🔵 Holiday/Weekend
+                examDay: 'bg-purple-500/80 text-foreground rounded-full', // 📚 Exam day
+                allPresent: 'bg-green-500/80 text-foreground rounded-full', // 🟢 Present
+                mixed: 'bg-yellow-500/80 text-foreground rounded-full', // 🟡 Partial  
+                allAbsent: 'bg-red-500/80 text-foreground rounded-full', // 🔴 Absent
               }}
             />
           )}
@@ -397,7 +434,10 @@ export default function Calendar() {
           </DialogHeader>
           <div className="flex flex-wrap items-center justify-center gap-2 pb-2">
             {selectedDate && isHolidayDate(selectedDate) && (
-              <Badge className="bg-neutral text-neutral-foreground">Holiday</Badge>
+              <Badge className="bg-blue-500 text-white">🔵 Holiday</Badge>
+            )}
+            {selectedDate && isExamDay(selectedDate) && (
+              <Badge className="bg-purple-500 text-white">📚 Exam Day</Badge>
             )}
             <Button size="sm" variant="outline" onClick={() => applyDayAction('present')}>Day: Present</Button>
             <Button size="sm" variant="outline" onClick={() => applyDayAction('absent')}>Day: Absent</Button>
@@ -413,6 +453,13 @@ export default function Calendar() {
                 })()}
               </Button>
             )}
+            <Button size="sm" variant="outline" onClick={() => applyDayAction('examDay')}>
+              {(() => {
+                const d = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+                const isExam = settings.examDays?.includes(d);
+                return isExam ? 'Remove Exam Day' : 'Set Exam Day';
+              })()}
+            </Button>
           </div>
           
           {selectedDate && (
@@ -443,7 +490,7 @@ export default function Calendar() {
                               aria-label="Mark present"
                               onClick={() => handleAttendanceUpdate(timeSlot.id, timeSlot.subjectId!, 'present')}
                               className="border-success hover:bg-success hover:text-success-foreground"
-                              disabled={selectedDate ? isHolidayDate(selectedDate) : false}
+                              disabled={selectedDate ? (isHolidayDate(selectedDate) || isExamDay(selectedDate)) : false}
                             >
                               <CheckCircle className="h-4 w-4" />
                             </Button>
@@ -453,7 +500,7 @@ export default function Calendar() {
                               aria-label="Mark absent"
                               onClick={() => handleAttendanceUpdate(timeSlot.id, timeSlot.subjectId!, 'absent')}
                               className="border-warning hover:bg-warning hover:text-warning-foreground"
-                              disabled={selectedDate ? isHolidayDate(selectedDate) : false}
+                              disabled={selectedDate ? (isHolidayDate(selectedDate) || isExamDay(selectedDate)) : false}
                             >
                               <XCircle className="h-4 w-4" />
                             </Button>
@@ -463,7 +510,7 @@ export default function Calendar() {
                               aria-label="Mark off"
                               onClick={() => handleAttendanceUpdate(timeSlot.id, timeSlot.subjectId!, 'cancelled')}
                               className="border-neutral hover:bg-neutral hover:text-neutral-foreground"
-                              disabled={selectedDate ? isHolidayDate(selectedDate) : false}
+                              disabled={selectedDate ? (isHolidayDate(selectedDate) || isExamDay(selectedDate)) : false}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
@@ -473,7 +520,7 @@ export default function Calendar() {
                               aria-label="Clear status"
                               onClick={() => handleClearAttendance(timeSlot.id)}
                               className="px-3"
-                              disabled={selectedDate ? isHolidayDate(selectedDate) : false}
+                              disabled={selectedDate ? (isHolidayDate(selectedDate) || isExamDay(selectedDate)) : false}
                             >
                               <XCircle className="h-4 w-4" />
                             </Button>

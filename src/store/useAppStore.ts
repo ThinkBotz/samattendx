@@ -40,6 +40,8 @@ interface AppState {
   setHolidays: (dates: string[]) => void;
   addHoliday: (date: string) => void;
   removeHoliday: (date: string) => void;
+  addExamDay: (date: string) => void;
+  removeExamDay: (date: string) => void;
   setSemester: (start?: string, end?: string) => void;
   
   // Profile actions
@@ -80,7 +82,7 @@ export const useAppStore = create<AppState>()(
       subjects: [],
       timetable: defaultTimetable,
       attendanceRecords: [],
-      settings: { holidays: [] },
+      settings: { holidays: [], examDays: [] },
       
       // Profiles storage
       profiles: (() => {
@@ -92,7 +94,7 @@ export const useAppStore = create<AppState>()(
             subjects: [],
             timetable: defaultTimetable,
             attendanceRecords: [],
-            settings: { holidays: [] },
+            settings: { holidays: [], examDays: [] },
           },
         };
       })(),
@@ -267,6 +269,8 @@ export const useAppStore = create<AppState>()(
       setHolidays: (dates) => set((state) => ({ settings: { ...state.settings, holidays: [...new Set(dates)] } })),
       addHoliday: (date) => set((state) => ({ settings: { ...state.settings, holidays: [...new Set([...state.settings.holidays, date])] } })),
       removeHoliday: (date) => set((state) => ({ settings: { ...state.settings, holidays: state.settings.holidays.filter(d => d !== date) } })),
+      addExamDay: (date) => set((state) => ({ settings: { ...state.settings, examDays: [...new Set([...(state.settings.examDays || []), date])] } })),
+      removeExamDay: (date) => set((state) => ({ settings: { ...state.settings, examDays: (state.settings.examDays || []).filter(d => d !== date) } })),
       setSemester: (start, end) => set((state) => ({ settings: { ...state.settings, semesterStart: start, semesterEnd: end } })),
 
       bulkMarkDates: (dates, pattern) => {
@@ -365,7 +369,7 @@ export const useAppStore = create<AppState>()(
             subjects: [],
             timetable: defaultTimetable,
             attendanceRecords: [],
-            settings: { holidays: [] },
+            settings: { holidays: [], examDays: [] },
           };
 
           const profiles = { ...updatedProfiles, [id]: emptyProfile };
@@ -379,7 +383,7 @@ export const useAppStore = create<AppState>()(
             subjects: [],
             timetable: defaultTimetable,
             attendanceRecords: [],
-            settings: { holidays: [] },
+            settings: { holidays: [], examDays: [] },
           };
         });
       },
@@ -479,7 +483,7 @@ export const useAppStore = create<AppState>()(
           subjects,
           timetable: data.timetable,
           attendanceRecords: data.attendanceRecords,
-          settings: data.settings ? { ...state.settings, ...data.settings } : (state.settings ?? { holidays: [] }),
+          settings: data.settings ? { ...state.settings, ...data.settings } : (state.settings ?? { holidays: [], examDays: [] }),
         }));
       },
     }),
@@ -508,7 +512,7 @@ export const useAppStore = create<AppState>()(
                 subjects: data.state.subjects || [],
                 timetable: data.state.timetable || defaultTimetable,
                 attendanceRecords: data.state.attendanceRecords || [],
-                settings: data.state.settings || { holidays: [] },
+                settings: data.state.settings || { holidays: [], examDays: [] },
               },
             };
             data.state.activeUserId = id;

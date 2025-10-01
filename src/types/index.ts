@@ -43,6 +43,7 @@ export interface AttendanceStats {
 
 export interface AcademicSettings {
   holidays: string[]; // ISO dates 'yyyy-MM-dd'
+  examDays?: string[]; // ISO dates 'yyyy-MM-dd' - treated as holidays (no attendance taken)
   semesterStart?: string; // ISO date
   semesterEnd?: string;   // ISO date
 }
