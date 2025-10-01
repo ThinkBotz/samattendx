@@ -1,0 +1,148 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Rebuild Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Rebuild Vite App 2",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Rebuild Vite App 3",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Preview Build",
+			"type": "shell",
+			"command": "npm run preview",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Vite App",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"problemMatcher": [
+				"$tsc",
+				"$eslint-stylish"
+			],
+			"group": "build"
+		}
+	]
+}
