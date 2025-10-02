@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { Clock, Edit3, Save, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Timetable() {
+  const navigate = useNavigate();
   const subjects = useAppStore((state) => state.subjects);
   const timetable = useAppStore((state) => state.timetable);
   const assignSubjectToSlot = useAppStore((state) => state.assignSubjectToSlot);
@@ -67,7 +69,10 @@ export default function Timetable() {
           <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-foreground mb-2">No Subjects Added</h3>
           <p className="text-muted-foreground mb-6">Add subjects first to create your timetable</p>
-          <Button className="bg-gradient-primary hover:bg-primary-hover">
+          <Button 
+            className="bg-gradient-primary hover:bg-primary-hover"
+            onClick={() => navigate('/subjects')}
+          >
             Go to Subjects
           </Button>
         </Card>
