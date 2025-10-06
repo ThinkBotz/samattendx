@@ -3,6 +3,7 @@
 ## Author
 
 **Name:** Syedmohamamd Sameer
+
 **Instagram:** @_samxiao
 
 # 📚 Student Attendance Tracker
