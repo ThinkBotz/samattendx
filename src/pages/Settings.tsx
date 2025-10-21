@@ -1,12 +1,14 @@
 import { Card } from '@/components/ui/card';
 import Diagnostics from './Diagnostics';
 import { Button } from '@/components/ui/button';
-import { Settings as SettingsIcon, Download, Upload, Trash2, Info } from 'lucide-react';
+import { Settings as SettingsIcon, Download, Upload, Trash2, Info, User } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
 import { useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { UserProfileSelector } from '@/components/UserProfileSelector';
 
 export default function Settings() {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
@@ -92,184 +94,247 @@ export default function Settings() {
   };
 
 
+  const [showAppearance, setShowAppearance] = useState(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(true);
+
   return (
     <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-24">
-      <div className="flex justify-end mb-2">
-        <Button variant="outline" onClick={() => setShowDiagnostics((v) => !v)}>
-          {showDiagnostics ? 'Hide Diagnostics' : 'Show Diagnostics'}
-        </Button>
-      </div>
-      {showDiagnostics && (
-        <div className="my-4">
-          <Diagnostics />
-        </div>
-      )}
       <div className="text-center px-2">
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Settings</h1>
         <p className="text-muted-foreground text-sm sm:text-base">Manage your app preferences</p>
       </div>
 
-      {/* App Info */}
-      <Card className="bg-gradient-card shadow-card border-0 p-4 sm:p-6">
+      {/* Profile Settings */}
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-background">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <Info className="h-5 w-5 text-primary mr-2" />
-            <h2 className="text-lg font-semibold text-foreground">App Information</h2>
+          <div className="flex items-center gap-2">
+            <User className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-semibold">Profile Settings</h2>
           </div>
           <Button
-            variant={showAppInfo ? 'default' : 'outline'}
+            variant="ghost"
             size="sm"
-            onClick={() => setShowAppInfo(!showAppInfo)}
-            className="min-h-[44px] touch-manipulation"
+            onClick={() => setShowProfileSettings((v) => !v)}
           >
-            {showAppInfo ? 'Hide Details' : 'Show Details'}
+            {showProfileSettings ? 'Hide' : 'Show'}
           </Button>
         </div>
-        
+        {showProfileSettings && (
+          <div className="space-y-4">
+            <div className="p-4 bg-card rounded-lg border shadow-sm">
+              <UserProfileSelector />
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* Appearance Settings */}
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-background">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <SettingsIcon className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-semibold">Appearance</h2>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAppearance((v) => !v)}
+          >
+            {showAppearance ? 'Hide' : 'Show'}
+          </Button>
+        </div>
+        {showAppearance && (
+          <div className="space-y-4">
+            <div className="p-4 bg-card rounded-lg border shadow-sm">
+              <div className="flex items-center justify-between">
+                <Label className="text-base">Theme Mode</Label>
+                <ThemeToggle />
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* App Info */}
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-background">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Info className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-semibold">App Information</h2>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAppInfo(!showAppInfo)}
+          >
+            {showAppInfo ? 'Hide' : 'Show'}
+          </Button>
+        </div>
         {showAppInfo && (
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <div className="flex justify-between">
-              <span>Total Subjects:</span>
-              <span className="font-medium text-foreground">{subjects.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Attendance Records:</span>
-              <span className="font-medium text-foreground">{attendanceRecords.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Version:</span>
-              <span className="font-medium text-foreground">1.2.2</span>
+          <div className="space-y-4">
+            <div className="p-4 bg-card rounded-lg border shadow-sm">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-base">Total Subjects</span>
+                  <span className="font-medium text-foreground">{subjects.length}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-base">Attendance Records</span>
+                  <span className="font-medium text-foreground">{attendanceRecords.length}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-base">Version</span>
+                  <span className="font-medium text-foreground">1.2.1</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
       </Card>
 
       {/* Academic Settings */}
-      <Card className="bg-gradient-card shadow-card border-0 p-4 sm:p-6">
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-background">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <SettingsIcon className="h-5 w-5 text-primary mr-2" />
-            <h2 className="text-lg font-semibold text-foreground">Academic Settings</h2>
+          <div className="flex items-center gap-2">
+            <SettingsIcon className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-semibold">Academic Settings</h2>
           </div>
           <Button
-            variant={showAcademicSettings ? 'default' : 'outline'}
+            variant="ghost"
             size="sm"
             onClick={() => setShowAcademicSettings(!showAcademicSettings)}
-            className="min-h-[44px] touch-manipulation"
           >
-            {showAcademicSettings ? 'Hide Options' : 'Show Options'}
+            {showAcademicSettings ? 'Hide' : 'Show'}
           </Button>
         </div>
         
         {showAcademicSettings && (
           <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="semesterStart">Semester Start</Label>
-              <Input id="semesterStart" type="date" value={semesterStart} onChange={(e) => setSemesterStart(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="semesterEnd">Semester End</Label>
-              <Input id="semesterEnd" type="date" value={semesterEnd} onChange={(e) => setSemesterEnd(e.target.value)} />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={() => { setSemester(semesterStart || undefined, semesterEnd || undefined); toast.success('Semester dates saved'); }}>Save Semester</Button>
-          </div>
-          <div className="space-y-2">
-            <Label>Add Holiday</Label>
-            <div className="flex gap-2">
-              <Input type="date" value={holidayInput} onChange={(e) => setHolidayInput(e.target.value)} />
-              <Button onClick={() => { if (holidayInput) { addHoliday(holidayInput); setHolidayInput(''); toast.success('Holiday added'); } }}>Add</Button>
-            </div>
-          </div>
-          {settings.holidays?.length ? (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {settings.holidays.map((d) => (
-                <div key={d} className="flex items-center justify-between p-2 bg-card rounded border">
-                  <span className="text-sm text-foreground">🔵 {d}</span>
-                  <Button size="sm" variant="ghost" onClick={() => removeHoliday(d)}>Remove</Button>
+            <div className="p-4 bg-card rounded-lg border shadow-sm space-y-6">
+              <div>
+                <h3 className="text-base font-semibold mb-4">Semester Duration</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="semesterStart" className="text-sm">Semester Start</Label>
+                    <Input id="semesterStart" type="date" value={semesterStart} onChange={(e) => setSemesterStart(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="semesterEnd" className="text-sm">Semester End</Label>
+                    <Input id="semesterEnd" type="date" value={semesterEnd} onChange={(e) => setSemesterEnd(e.target.value)} />
+                  </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No holidays added</p>
-          )}
-          <div className="space-y-2">
-            <Label>Add Exam Day (no attendance taken)</Label>
-            <div className="flex gap-2">
-              <Input type="date" value={examDayInput} onChange={(e) => setExamDayInput(e.target.value)} />
-              <Button onClick={() => { if (examDayInput) { addExamDay(examDayInput); setExamDayInput(''); toast.success('Exam day added'); } }}>📚 Add</Button>
-            </div>
-          </div>
-          {settings.examDays?.length ? (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {settings.examDays.map((d) => (
-                <div key={d} className="flex items-center justify-between p-2 bg-card rounded border border-purple-200">
-                  <span className="text-sm text-foreground">📚 {d}</span>
-                  <Button size="sm" variant="ghost" onClick={() => removeExamDay(d)}>Remove</Button>
+                <div className="flex justify-end mt-4">
+                  <Button variant="outline" onClick={() => { setSemester(semesterStart || undefined, semesterEnd || undefined); toast.success('Semester dates saved'); }}>
+                    Save Semester
+                  </Button>
                 </div>
-              ))}
+              </div>
+
+              <div className="pt-4 border-t">
+                <h3 className="text-base font-semibold mb-4">Holidays</h3>
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input type="date" value={holidayInput} onChange={(e) => setHolidayInput(e.target.value)} className="flex-1" />
+                    <Button onClick={() => { if (holidayInput) { addHoliday(holidayInput); setHolidayInput(''); toast.success('Holiday added'); } }}>
+                      Add Holiday
+                    </Button>
+                  </div>
+                  {settings.holidays?.length ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {settings.holidays.map((d) => (
+                        <div key={d} className="flex items-center justify-between p-2 bg-background rounded border">
+                          <span className="text-sm text-foreground">🔵 {d}</span>
+                          <Button size="sm" variant="ghost" onClick={() => removeHoliday(d)}>Remove</Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No holidays added</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t">
+                <h3 className="text-base font-semibold mb-4">Exam Days</h3>
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input type="date" value={examDayInput} onChange={(e) => setExamDayInput(e.target.value)} className="flex-1" />
+                    <Button onClick={() => { if (examDayInput) { addExamDay(examDayInput); setExamDayInput(''); toast.success('Exam day added'); } }}>
+                      Add Exam Day
+                    </Button>
+                  </div>
+                  {settings.examDays?.length ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {settings.examDays.map((d) => (
+                        <div key={d} className="flex items-center justify-between p-2 bg-background rounded border">
+                          <span className="text-sm text-foreground">📚 {d}</span>
+                          <Button size="sm" variant="ghost" onClick={() => removeExamDay(d)}>Remove</Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No exam days added</p>
+                  )}
+                </div>
+              </div>
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">No exam days added</p>
-          )}
           </div>
         )}
       </Card>
 
   {/* Data Management */}
-      <Card className="bg-gradient-card shadow-card border-0 p-4 sm:p-6">
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-background">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <SettingsIcon className="h-5 w-5 text-primary mr-2" />
-            <h2 className="text-lg font-semibold text-foreground">Data Management</h2>
+          <div className="flex items-center gap-2">
+            <SettingsIcon className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-semibold">Data Management</h2>
           </div>
           <Button
-            variant={showDataManagement ? 'default' : 'outline'}
+            variant="ghost"
             size="sm"
             onClick={() => setShowDataManagement(!showDataManagement)}
-            className="min-h-[44px] touch-manipulation"
           >
-            {showDataManagement ? 'Hide Options' : 'Show Options'}
+            {showDataManagement ? 'Hide' : 'Show'}
           </Button>
         </div>
         
         {showDataManagement && (
           <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-foreground">Export Data</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Download a backup of all your data</p>
+            <div className="p-4 bg-card rounded-lg border shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-semibold text-foreground">Export Data</h3>
+                  <p className="text-sm text-muted-foreground">Download a backup of all your data</p>
+                </div>
+                <Button variant="outline" onClick={exportData} className="shrink-0 w-full sm:w-auto">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-semibold text-foreground">Import Data</h3>
+                  <p className="text-sm text-muted-foreground">Restore data from a backup file</p>
+                </div>
+                <Button variant="outline" onClick={handleImportClick} className="shrink-0 w-full sm:w-auto">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </Button>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pt-2 border-t">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-semibold text-destructive">Clear All Data</h3>
+                  <p className="text-sm text-muted-foreground">Permanently delete all subjects, timetables, and attendance records</p>
+                </div>
+                <Button variant="outline" onClick={clearAllData} className="shrink-0 w-full sm:w-auto text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear
+                </Button>
+              </div>
             </div>
-            <Button variant="outline" onClick={exportData} className="shrink-0 w-full sm:w-auto">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
           </div>
-          
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-foreground">Import Data</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Restore data from a backup file</p>
-            </div>
-            <Button variant="outline" onClick={handleImportClick} className="shrink-0 w-full sm:w-auto">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border border-destructive/20">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-destructive">Clear All Data</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Permanently delete all subjects, timetables, and attendance records</p>
-            </div>
-            <Button variant="outline" onClick={clearAllData} className="shrink-0 w-full sm:w-auto text-destructive hover:bg-destructive hover:text-destructive-foreground">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear
-            </Button>
-          </div>
-        </div>
         )}
       </Card>
 

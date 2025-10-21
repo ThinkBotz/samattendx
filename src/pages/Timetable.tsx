@@ -135,7 +135,7 @@ export default function Timetable() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[56px] sm:w-[100px] sticky left-0 bg-background z-10 border-r px-1">
-                      <div className="text-[9px] sm:text-sm font-semibold">Time</div>
+                      <div className="text-[9px] sm:text-sm font-semibold">Period</div>
                     </TableHead>
                     {timetable.schedule.map((day) => (
                       <TableHead key={day.day} className="text-center px-1 sm:px-4">
@@ -148,11 +148,8 @@ export default function Timetable() {
                   {timetable.schedule[0]?.timeSlots.map((_, slotIndex) => (
                     <TableRow key={slotIndex} className="hover:bg-muted/50">
                       <TableCell className="font-medium text-[9px] sm:text-sm sticky left-0 bg-background z-10 border-r py-1 sm:py-3 px-1">
-                        <div className="whitespace-nowrap">
-                          {timetable.schedule[0].timeSlots[slotIndex].startTime}
-                          <br className="sm:hidden" />
-                          <span className="hidden sm:inline"> - </span>
-                          {timetable.schedule[0].timeSlots[slotIndex].endTime}
+                        <div className="whitespace-nowrap text-center">
+                          Period {slotIndex + 1}
                         </div>
                       </TableCell>
                       {timetable.schedule.map((day) => {

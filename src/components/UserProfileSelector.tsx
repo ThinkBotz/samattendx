@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Plus, Check, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
 
-export default function UserProfileSelector() {
+export function UserProfileSelector() {
 	const users = useAppStore((s) => s.users);
 	const activeUserId = useAppStore((s) => s.activeUserId);
 	const addUser = useAppStore((s) => s.addUser);
@@ -50,10 +50,10 @@ export default function UserProfileSelector() {
 		};
 
 		return (
-			<div className="flex items-center gap-1 xs:gap-2">
+			<div className="flex items-center justify-center w-full">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="ghost" size="sm" className="px-2 min-h-[44px] touch-manipulation border border-border/50 hover:border-primary/50">
+					<Button variant="ghost" size="sm" className="px-4 min-h-[44px] touch-manipulation border border-border/50 hover:border-primary/50">
 						<div className="flex items-center gap-2">
 							<Avatar className="h-6 w-6">
 								<AvatarFallback className="text-xs bg-primary/10 text-primary">{(active?.name || 'U').slice(0,1).toUpperCase()}</AvatarFallback>

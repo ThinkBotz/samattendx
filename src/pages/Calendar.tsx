@@ -52,17 +52,20 @@ export default function Calendar() {
   // Month selection state
   const [selectedMonth, setSelectedMonth] = useState<string | undefined>(undefined);
 
-  // Calculate monthly stats (use total periods for denominator)
+  // Calculate monthly stats (only counting periods where attendance was taken)
   const getMonthlyStats = (month: string) => {
     const records = recordsByMonth[month] || [];
-    const present = records.filter(r => r.status === 'present').length;
-    const absent = records.filter(r => r.status === 'absent').length;
-    const { totalPeriods } = getWorkingDaysAndPeriodsInMonth(month);
-    // Always show out of 100% (all periods present = 100%)
-    const percentage = totalPeriods > 0 ? (present / totalPeriods) * 100 : 0;
+    // Only count records where attendance was taken (present or absent)
+    const validRecords = records.filter(r => r.status === 'present' || r.status === 'absent');
+    const present = validRecords.filter(r => r.status === 'present').length;
+    const absent = validRecords.filter(r => r.status === 'absent').length;
+    const totalTaken = present + absent; // Total classes where attendance was taken
+    
+    // Calculate percentage based only on classes where attendance was taken
+    const percentage = totalTaken > 0 ? (present / totalTaken) * 100 : 0;
     // Clamp to 100 if over (shouldn't happen, but for safety)
     const clamped = Math.min(percentage, 100);
-    return { total: totalPeriods, present, absent, percentage: Math.round(clamped * 100) / 100 };
+    return { total: totalTaken, present, absent, percentage: Math.round(clamped * 100) / 100 };
   };
 
   // Calculate working days and periods in a month (excluding holidays and Sundays)
@@ -153,19 +156,31 @@ export default function Calendar() {
   };
 
   const stats = useMemo(() => {
-    const totalClasses = attendanceRecords.filter(r => r.status !== 'cancelled').length;
-    const presentClasses = attendanceRecords.filter(r => r.status === 'present').length;
-    const absentClasses = attendanceRecords.filter(r => r.status === 'absent').length;
+    // Only include records where attendance was taken (present or absent)
+    const validRecords = attendanceRecords.filter(r => r.status === 'present' || r.status === 'absent');
+    const totalClassesConducted = validRecords.length;
+    
+    // Count present classes
+    const presentClasses = validRecords.filter(r => r.status === 'present').length;
+    
+    // Count absent classes
+    const absentClasses = validRecords.filter(r => r.status === 'absent').length;
+    
+    // Count cancelled classes separately (not included in percentage calculation)
     const cancelledClasses = attendanceRecords.filter(r => r.status === 'cancelled').length;
     
-    const percentage = totalClasses > 0 ? (presentClasses / totalClasses) * 100 : 0;
+    // Calculate percentage only from classes where attendance was taken:
+    // (Present Classes / (Present + Absent Classes)) × 100
+    const percentage = totalClassesConducted > 0 
+      ? (presentClasses / totalClassesConducted) * 100 
+      : 0;
 
     return {
-      totalClasses,
-      presentClasses,
+      totalClasses: totalClassesConducted,  // Total conducted (like 155 in your image)
+      presentClasses,                       // Classes attended (like 142, 134)
       absentClasses,
       cancelledClasses,
-      percentage: Math.round(percentage * 100) / 100,
+      percentage: Math.round(percentage * 100) / 100, // Round to 2 decimals (like 91.61%, 86.45%)
     };
   }, [attendanceRecords]);
 
@@ -251,14 +266,20 @@ export default function Calendar() {
     const dateObj = selectedDate || new Date();
     const dateString = format(dateObj, 'yyyy-MM-dd');
     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-    if (action === 'holiday') {
+      if (action === 'holiday') {
       if (isSunday(dateObj)) return; // Sundays are always holidays; no toggle
+      if (isExamDay(dateObj)) return; // Can't set holiday on exam day
+      
       const isExplicitHoliday = settings.holidays?.includes(dateString);
       if (isExplicitHoliday) {
+        // Remove the holiday flag first
         removeHoliday(dateString);
+        // Clear all attendance records for that day
+        useAppStore.getState().markAllDayAttendance(dateString, dayName, 'clear');
       } else {
+        // First set the holiday flag
         addHoliday(dateString);
-        // mark all as cancelled for holiday
+        // Then mark all as cancelled for holiday
         useAppStore.getState().markAllDayAttendance(dateString, dayName, 'cancelled');
       }
       setIsDialogOpen(false);
@@ -266,12 +287,18 @@ export default function Calendar() {
       return;
     }
     if (action === 'examDay') {
+      if (isHolidayDate(dateObj)) return; // Can't set exam day on holiday
+      
       const isExam = settings.examDays?.includes(dateString);
       if (isExam) {
+        // Remove the exam day flag first
         removeExamDay(dateString);
+        // Clear all attendance records for that day
+        useAppStore.getState().markAllDayAttendance(dateString, dayName, 'clear');
       } else {
+        // First set the exam day flag
         addExamDay(dateString);
-        // mark all as cancelled for exam day (no attendance taken)
+        // Then mark all as cancelled for exam day
         useAppStore.getState().markAllDayAttendance(dateString, dayName, 'cancelled');
       }
       setIsDialogOpen(false);
@@ -296,11 +323,54 @@ export default function Calendar() {
 
   const sortedDates = Object.keys(recordsByDate).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-  return (
-    <div className="space-y-6 pb-24">
 
+     
+
+
+  return (
+    
+    <div className="min-h-screen pb-16">
+      <div className="container mx-auto px-4 space-y-4">
+ <div className="text-center">
+        <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-foreground mb-2">Calendar</h1>
+        <p className="text-sm xs:text-base text-muted-foreground">View your attendance history</p>
+      </div>
+
+      {/* Optimized single-row stats grid */}
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-4 gap-1 xs:gap-2 w-full">
+          <Card className="bg-gradient-card shadow-card border border-[hsl(var(--card-border))] dark:border-[hsl(var(--card-border))] backdrop-blur-sm p-1.5 xs:p-2 text-center">
+            <div className="text-sm xs:text-base sm:text-lg font-bold text-success">{stats.presentClasses}</div>
+            <div className="text-[9px] xs:text-[10px] text-muted-foreground">Attended</div>
+          </Card>
+          <Card className="bg-gradient-card shadow-card border border-[hsl(var(--card-border))] dark:border-[hsl(var(--card-border))] backdrop-blur-sm p-1.5 xs:p-2 text-center">
+            <div className="text-sm xs:text-base sm:text-lg font-bold text-warning">{stats.absentClasses}</div>
+            <div className="text-[9px] xs:text-[10px] text-muted-foreground">Missed</div>
+          </Card>
+          <Card className="bg-gradient-card shadow-card border border-[hsl(var(--card-border))] dark:border-[hsl(var(--card-border))] backdrop-blur-sm p-1.5 xs:p-2 text-center">
+            <div className="text-sm xs:text-base sm:text-lg font-bold text-neutral">{stats.cancelledClasses}</div>
+            <div className="text-[9px] xs:text-[10px] text-muted-foreground">No Class</div>
+          </Card>
+          <Card className="bg-gradient-card shadow-card border border-[hsl(var(--card-border))] dark:border-[hsl(var(--card-border))] backdrop-blur-sm p-1.5 xs:p-2 text-center">
+            <div className="text-sm xs:text-base sm:text-lg font-bold text-primary">{stats.percentage.toFixed(1)}%</div>
+            <div className="text-[9px] xs:text-[10px] text-muted-foreground">Overall</div>
+          </Card>
+        </div>
+        
+        {/* Progress bar */}
+        <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+          <div 
+            className={`h-full rounded-full transition-all ${
+              stats.percentage >= 75 ? 'bg-success' : 
+              stats.percentage >= 60 ? 'bg-warning' : 
+              'bg-destructive'
+            }`}
+            style={{ width: `${Math.min(100, stats.percentage)}%` }}
+          />
+        </div>
+      </div>
       {/* Interactive Calendar - Enhanced for mobile */}
-      <Card className="bg-gradient-card shadow-card border-0 p-3 xs:p-4 sm:p-6">
+      <Card className="bg-gradient-card shadow-card border border-[hsl(var(--card-border))] dark:border-[hsl(var(--card-border))] backdrop-blur-sm p-3 xs:p-4 sm:p-6">
         <div className="text-center mb-4">
           <h2 className="text-lg xs:text-xl font-semibold text-foreground mb-2">Select a Date</h2>
           <p className="text-xs xs:text-sm text-muted-foreground">Tap on a date to view and edit attendance</p>
@@ -314,9 +384,10 @@ export default function Calendar() {
               className="min-h-[44px] touch-manipulation"
               onClick={() => { setMultiMode((v) => !v); setMulti([]); }}
               aria-label="Multi Select"
+              
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              <span className="text-xs xs:text-sm">Multi Select</span>
+             
             </Button>
             {multiMode && multi.length > 0 && (
               <>
@@ -355,12 +426,13 @@ export default function Calendar() {
                 <Button size="sm" variant="outline" onClick={() => {
                   const list = multi.map(d => format(d, 'yyyy-MM-dd'));
                   list.forEach(dateString => {
-                    // Remove holiday, exam day, and clear all attendance for the date
-                    removeHoliday(dateString);
-                    removeExamDay(dateString);
                     const dateObj = new Date(dateString);
                     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+                    // First clear attendance
                     useAppStore.getState().markAllDayAttendance(dateString, dayName, 'clear');
+                    // Then remove holiday and exam day flags
+                    removeHoliday(dateString);
+                    removeExamDay(dateString);
                   });
                   setMulti([]);
                 }}>Apply Clear</Button>
@@ -445,7 +517,12 @@ export default function Calendar() {
             {selectedDate && isSunday(selectedDate) ? (
               <Button size="sm" variant="outline" disabled>Sunday: Holiday</Button>
             ) : (
-              <Button size="sm" variant="outline" onClick={() => applyDayAction('holiday')}>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => applyDayAction('holiday')}
+                disabled={selectedDate ? isExamDay(selectedDate) : false}
+              >
                 {(() => {
                   const d = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
                   const isExplicitHol = settings.holidays?.includes(d);
@@ -453,7 +530,12 @@ export default function Calendar() {
                 })()}
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={() => applyDayAction('examDay')}>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => applyDayAction('examDay')}
+              disabled={selectedDate ? isHolidayDate(selectedDate) : false}
+            >
               {(() => {
                 const d = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
                 const isExam = settings.examDays?.includes(d);
@@ -476,7 +558,7 @@ export default function Calendar() {
                     const subject = subjects.find(s => s.id === timeSlot.subjectId);
                     
                     return (
-                      <Card key={timeSlot.id} className="p-3 border">
+                      <Card key={timeSlot.id} className="p-3 border border-[hsl(var(--card-border))] dark:border-[hsl(var(--card-border))] bg-card/50 backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-2 gap-3">
                           <div>
                             <h4 className="font-semibold text-foreground">
@@ -541,33 +623,10 @@ export default function Calendar() {
         </DialogContent>
       </Dialog>
 
-      <div className="text-center">
-        <h1 className="text-xl xs:text-2xl sm:text-3xl font-bold text-foreground mb-2">Calendar</h1>
-        <p className="text-sm xs:text-base text-muted-foreground">View your attendance history</p>
-      </div>
-
-      {/* Optimized single-row stats grid */}
-      <div className="grid grid-cols-4 gap-1 xs:gap-2 w-full">
-        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
-          <div className="text-sm xs:text-base sm:text-lg font-bold text-success">{stats.presentClasses}</div>
-          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Present</div>
-        </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
-          <div className="text-sm xs:text-base sm:text-lg font-bold text-warning">{stats.absentClasses}</div>
-          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Absent</div>
-        </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
-          <div className="text-sm xs:text-base sm:text-lg font-bold text-neutral">{stats.cancelledClasses}</div>
-          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Cancelled</div>
-        </Card>
-        <Card className="bg-gradient-card shadow-card border-0 p-1.5 xs:p-2 text-center">
-          <div className="text-sm xs:text-base sm:text-lg font-bold text-primary">{stats.percentage.toFixed(1)}%</div>
-          <div className="text-[9px] xs:text-[10px] text-muted-foreground">Average</div>
-        </Card>
-      </div>
+      
 
       {/* Enhanced Monthly Attendance Overview */}
-      <Card className="bg-gradient-card shadow-card border-0 p-4 xs:p-6">
+      <Card className="bg-gradient-card shadow-card border border-[hsl(var(--section-border))] dark:border-[hsl(var(--section-border))] backdrop-blur-sm p-4 xs:p-6">
         <div className="mb-4">
           <h2 className="text-lg xs:text-xl font-semibold text-foreground mb-2">📊 Monthly Overview</h2>
           <p className="text-muted-foreground text-xs xs:text-sm">Select a month to view detailed analysis</p>
@@ -602,24 +661,24 @@ export default function Calendar() {
                   <div className="grid grid-cols-2 xs:grid-cols-4 gap-3">
                     <Card className="p-3 text-center bg-primary/10 border-primary/20">
                       <div className="text-xl xs:text-2xl font-bold text-primary">{monthlyStats.percentage ?? 0}%</div>
-                      <div className="text-[10px] xs:text-xs text-muted-foreground">Avg. Attendance</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">Attendance</div>
                     </Card>
                     <Card className="p-3 text-center bg-success/10 border-success/20">
                       <div className="text-xl xs:text-2xl font-bold text-success">{monthlyStats.present ?? 0}</div>
-                      <div className="text-[10px] xs:text-xs text-muted-foreground">Present</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">Attended</div>
                     </Card>
                     <Card className="p-3 text-center bg-warning/10 border-warning/20">
                       <div className="text-xl xs:text-2xl font-bold text-warning">{monthlyStats.absent ?? 0}</div>
-                      <div className="text-[10px] xs:text-xs text-muted-foreground">Absent</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">Missed</div>
                     </Card>
                     <Card className="p-3 text-center bg-muted/10 border-muted/20">
-                      <div className="text-xl xs:text-2xl font-bold text-foreground">{attendanceReq.totalPeriods ?? 0}</div>
-                      <div className="text-[10px] xs:text-xs text-muted-foreground">Total Periods</div>
+                      <div className="text-xl xs:text-2xl font-bold text-neutral">{stats.cancelledClasses ?? 0}</div>
+                      <div className="text-[10px] xs:text-xs text-muted-foreground">No Class</div>
                     </Card>
                   </div>
                   
                   {/* Detailed Requirements */}
-                  <div className="grid grid-cols-2 xs:grid-cols-4 gap-2 xs:gap-3">
+                  {/* <div className="grid grid-cols-2 xs:grid-cols-4 gap-2 xs:gap-3">
                     <div className="p-2 xs:p-3 text-center bg-success/5 rounded-lg border border-success/10">
                       <div className="text-sm xs:text-base font-bold text-success">{attendanceReq.minAttendPeriods ?? 0}</div>
                       <div className="text-[9px] xs:text-[10px] text-muted-foreground leading-tight">Min. Periods to Attend</div>
@@ -636,7 +695,7 @@ export default function Calendar() {
                       <div className="text-sm xs:text-base font-bold text-primary">{attendanceReq.perPeriodValue ?? 0}%</div>
                       <div className="text-[9px] xs:text-[10px] text-muted-foreground leading-tight">Per Period Value</div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               );
             })()}
@@ -685,7 +744,12 @@ export default function Calendar() {
                     <div className="flex items-center space-x-2">
                       <TrendingUp className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium text-primary">
-                        {Math.round((records.filter(r => r.status === 'present').length / records.filter(r => r.status !== 'cancelled').length) * 100) || 0}%
+                        {(() => {
+                          // Only include records where attendance was taken (present or absent)
+                          const validRecords = records.filter(r => r.status === 'present' || r.status === 'absent');
+                          const presentCount = validRecords.filter(r => r.status === 'present').length;
+                          return validRecords.length > 0 ? Math.round((presentCount / validRecords.length) * 100) : 0;
+                        })()}%
                       </span>
                     </div>
                   </div>
@@ -711,6 +775,7 @@ export default function Calendar() {
           </div>
         ))}
       </div>
+      </div>
     </div>
   );
-}
+} // end of Calendar component
